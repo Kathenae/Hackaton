@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useUser } from "@clerk/clerk-react"
 import { Background, Controls, Node, ReactFlow, useNodesState } from 'reactflow'
 
