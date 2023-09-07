@@ -11,9 +11,8 @@
   },
   "dependencies": {
     "@clerk/clerk-react": "^4.24.2",
-    "@emotion/react": "^11.11.1",
-    "@emotion/styled": "^11.11.0",
-    "@mui/material": "^5.14.8",
+    "@egoist/tailwindcss-icons": "^1.1.0",
+    "@iconify/json": "^2.2.112",
     "@uiw/react-codemirror": "^4.21.13",
     "convex": "^1.2.1",
     "react": "^18.2.0",
