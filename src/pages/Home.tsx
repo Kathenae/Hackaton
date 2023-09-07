@@ -1,7 +1,7 @@
 import { MenuToggle } from "@/components/MenuToggle";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { ModeToggle } from "@/components/ModeToggle";
-import { useUser } from "@clerk/clerk-react"
+import { UserButton, useUser } from "@clerk/clerk-react"
 import { Background, Controls, Node, ReactFlow, useNodesState } from 'reactflow'
 
 import 'reactflow/dist/style.css';
@@ -34,8 +34,9 @@ export default function Home() {
                <MenuToggle />
             </div>
 
-            <div className="absolute p-2 top-0 right-0 flex">
+            <div className="absolute p-2 space-x-2 top-0 right-0 flex items-center">
                <ModeToggle />
+               <UserButton />
             </div>
          </div>
       </>
