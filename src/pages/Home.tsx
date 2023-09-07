@@ -1,3 +1,6 @@
+import { MenuToggle } from "@/components/MenuToggle";
+import { useTheme } from "@/components/providers/ThemeProvider";
+import { ModeToggle } from "@/components/ModeToggle";
 import { useUser } from "@clerk/clerk-react"
 import { Background, Controls, Node, ReactFlow, useNodesState } from 'reactflow'
 
@@ -9,6 +12,7 @@ export default function Home() {
 
    const { isSignedIn } = useUser()
    const [nodes, , onNodesChange] = useNodesState(initialNodes);
+   const { theme, systemIsDark } = useTheme()
 
    if (!isSignedIn) {
       return null;
@@ -16,16 +20,23 @@ export default function Home() {
 
    return (
       <>
-         <div className="relative w-screen h-screen">
+         <div className="relative w-screen h-screen bg-dark-400">
             <ReactFlow
                nodes={nodes}
                onNodesChange={onNodesChange}
                fitView
-               attributionPosition="top-right"
+               attributionPosition="bottom-left"
             >
                <Controls position="bottom-right"/>
-               <Background color="#000" gap={24} />
+               <Background color={theme == 'dark' || (theme == 'system' && systemIsDark)? '#fff' : '#000'} gap={16} />
             </ReactFlow>
+            <div className="absolute p-2 space-x-2 top-0 left-0 flex">
+               <MenuToggle />
+            </div>
+
+            <div className="absolute p-2 top-0 right-0 flex">
+               <ModeToggle />
+            </div>
          </div>
       </>
    )
