@@ -24,7 +24,7 @@ export default function Home() {
                attributionPosition="top-right"
             >
                <Controls position="bottom-right"/>
-               <Background color="#aaa" gap={16} />
+               <Background color="#000" gap={24} />
             </ReactFlow>
          </div>
       </>
