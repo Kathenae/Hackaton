@@ -1,7 +1,7 @@
-.cl-card{
+.dark .cl-card{
    @apply bg-background text-foreground;
 }
 
-.cl-card *:not(button, img, .cl-profileSectionPrimaryButton *, .cl-accordionTriggerButton  *, .cl-userPreviewAvatarBox * ){
+.dark .cl-card *:not(button, img, .cl-profileSectionPrimaryButton *, .cl-accordionTriggerButton  *, .cl-userPreviewAvatarBox * ){
    @apply bg-background text-foreground;
 }
