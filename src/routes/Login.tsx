@@ -1,5 +1,10 @@
+import { SignIn } from "@clerk/clerk-react";
+// import { Button } from "@mui/material";
+
 export default function Login(){
    return (
-      <h1>Login Page</h1>
+      <div className="flex items-center justify-center h-screen">
+         <SignIn />
+      </div>
    )
 }
