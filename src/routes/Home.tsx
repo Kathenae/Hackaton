@@ -1,22 +1,33 @@
+import { useState } from 'react'
 import { useUser } from "@clerk/clerk-react"
-import { Avatar } from "@mui/material"
+import { Background, Controls, Node, ReactFlow, useNodesState } from 'reactflow'
 
-export default function Home(){
+import 'reactflow/dist/style.css';
 
-   const {isSignedIn, user} = useUser()
+const initialNodes: Node[] = []
 
-   if(!isSignedIn){
+export default function Home() {
+
+   const { isSignedIn } = useUser()
+   const [nodes, , onNodesChange] = useNodesState(initialNodes);
+
+   if (!isSignedIn) {
       return null;
    }
 
    return (
       <>
-         <h1>Home Page</h1>
-         <Avatar 
-            alt={user.imageUrl}
-            src={user.imageUrl}
-         />
-         <p>{user?.fullName}</p>
+         <div className="relative w-screen h-screen">
+            <ReactFlow
+               nodes={nodes}
+               onNodesChange={onNodesChange}
+               fitView
+               attributionPosition="top-right"
+            >
+               <Controls position="bottom-right"/>
+               <Background color="#aaa" gap={16} />
+            </ReactFlow>
+         </div>
       </>
    )
 }
