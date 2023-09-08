@@ -31,7 +31,7 @@ export default function ModalProvider({ children }: PropsWithChildren) {
    return (
       <ModalContext.Provider value={{ modal, setModal }}>
          {children}
-         <CreateProjectModal open={modal == 'create-project'} onOpenStateChange={(open) => handleToggleModal('create-project', open)} />
+         {modal == 'create-project' && <CreateProjectModal open={modal == 'create-project'} onOpenStateChange={(open) => handleToggleModal('create-project', open)} />}
       </ModalContext.Provider>
    )
 }
