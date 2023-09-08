@@ -16,9 +16,9 @@ export default function Root() {
    return (
       <ClerkProvider appearance={{ baseTheme: ((theme === 'dark' || (theme === 'system' && systemIsDark)) ? dark : undefined) }} publishableKey={'pk_test_c2VsZWN0ZWQtYWtpdGEtODMuY2xlcmsuYWNjb3VudHMuZGV2JA'}>
          <ConvexProviderWithClerk client={convex} useAuth={useAuth}>
-            <ModalProvider>
-               <Outlet />
-            </ModalProvider>
+               <ModalProvider>
+                  <Outlet />
+               </ModalProvider>
          </ConvexProviderWithClerk>
       </ClerkProvider>
    )
