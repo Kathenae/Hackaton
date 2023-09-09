@@ -6,9 +6,9 @@ import { useTheme } from "./providers/ThemeProvider";
 import { useEffect, useState } from "react";
 import { cn, getFileIconClass } from '@/lib/utils';
 
-type FileViewMNodeProps = NodeProps<BranchFile>
+type EditorNodeProps = NodeProps<BranchFile>
 
-export default function FileViewMNode({ id, data }: FileViewMNodeProps) {
+export default function EditorNode({ id, data }: EditorNodeProps) {
 
    const { theme, systemIsDark } = useTheme()
    const [content, setContent] = useState()
@@ -64,8 +64,8 @@ export default function FileViewMNode({ id, data }: FileViewMNodeProps) {
                <i className={`${getFileIconClass(data.path ?? '')}`}/>
                <span>{data.path}</span>
             </h1>
-            <button onClick={onClose}>
-               <X className='absolute top-4 right-4 scale-75 text-gray-400 cursor-pointer' />
+            <button className='absolute top-4 right-4 scale-75 text-gray-400 cursor-pointer' onClick={onClose}>
+               <X />
             </button>
          </header>
          <div className={cn("transition-all", isExpanded ? "h-[400px] w-[700px]" : "w-[264px]")}>

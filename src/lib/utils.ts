@@ -39,7 +39,8 @@ const extensionToIconClassMap = {
 export function createFileNode(file: BranchFile, position: {x: number, y: number}) {
   return {
     id: Math.round((Math.random() * 100000)).toString(), 
-    type: 'fileview', position, 
+    type: 'editor', 
+    position, 
     dragHandle: '.drag-handle',
     data: file,
   }

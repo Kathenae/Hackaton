@@ -7,16 +7,14 @@ export default defineSchema({
       owner: v.string(),
       repo: v.string(),
    }),
-   fileviews: defineTable({
+   editornodes: defineTable({
       projectId: v.id('projects'),
+      expanded: v.boolean(),
       path: v.string(),
-      rawContent: v.string(),
-      encoding: v.string(),
+      content: v.string(),
       position: v.object({
          x: v.number(),
          y: v.number(),
       }),
-   })
-      .index('byProjectId', ['projectId'])
-      .index('byPath', ['path'])
+   }).index('byProjectId', ['projectId']).index('byPath', ['path']),
 });

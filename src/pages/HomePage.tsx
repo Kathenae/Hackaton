@@ -6,7 +6,7 @@ import { useEffect } from "react";
 
 import 'reactflow/dist/style.css';
 
-export default function Home() {
+export default function HomePage() {
 
    const { openModal } = useModal()
    const userProjects = useQuery(api.projects.listForUser)

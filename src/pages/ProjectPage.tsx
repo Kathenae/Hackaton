@@ -12,15 +12,15 @@ import { useCallback, useEffect, useState } from "react";
 import {BranchFile, listBranchFiles} from "@/lib/github";
 import { FileSelector } from "@/components/FileSelector";
 import BranchSelector from "@/components/BranchSelector";
-import FileViewMNode from "@/components/FileViewNode";
+import EditorNode from "@/components/EditorNode";
 import { createFileNode } from "@/lib/utils";
 
 const initialNodes: Node[] = []
 const nodeTypes = {
-   fileview: FileViewMNode
+   editor: EditorNode
 }
 
-export default function Project() {
+export default function ProjectPage() {
 
    const { isSignedIn } = useUser()
    const { id } = useParams<{ id: string }>()
@@ -77,7 +77,7 @@ export default function Project() {
                onDragOver={onDragOver}
                onDrop={onDrop}
             >
-               <Background color={theme == 'dark' || (theme == 'system' && systemIsDark) ? '#fff' : '#000'} gap={16} />
+               <Background color={theme == 'dark' || (theme == 'system' && systemIsDark) ? '#fff' : '#000'} gap={32} />
                <Controls position="bottom-right" />
             </ReactFlow>
 
