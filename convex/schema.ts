@@ -17,4 +17,6 @@ export default defineSchema({
          y: v.number(),
       }),
    })
+      .index('byProjectId', ['projectId'])
+      .index('byPath', ['path'])
 });
