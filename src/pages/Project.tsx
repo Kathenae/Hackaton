@@ -2,16 +2,23 @@ import { MenuToggle } from "@/components/MenuToggle";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { ModeToggle } from "@/components/ModeToggle";
 import { UserButton, useUser } from "@clerk/clerk-react"
-import { Background, Controls, Node, ReactFlow, useNodesState } from 'reactflow'
+import { Background, Controls, Node, ReactFlow, useNodesState, useReactFlow } from 'reactflow'
 import { Id } from "../../convex/_generated/dataModel"
 import { api } from "../../convex/_generated/api";
 import 'reactflow/dist/style.css';
 import { useParams } from "react-router-dom";
 import { useQuery, } from "convex/react";
-import { useEffect, useRef } from "react";
-import * as github from "@/lib/github";
+import { useCallback, useEffect, useState } from "react";
+import {BranchFile, listBranchFiles} from "@/lib/github";
+import { FileSelector } from "@/components/FileSelector";
+import BranchSelector from "@/components/BranchSelector";
+import FileViewMNode from "@/components/FileViewNode";
+import { createFileNode } from "@/lib/utils";
 
 const initialNodes: Node[] = []
+const nodeTypes = {
+   fileview: FileViewMNode
+}
 
 export default function Project() {
 
@@ -20,17 +27,40 @@ export default function Project() {
    const project = useQuery(api.projects.get, { id: id as Id<"projects"> })
    const [nodes, , onNodesChange] = useNodesState(initialNodes);
    const { theme, systemIsDark } = useTheme()
-   const repoFiles = useRef<github.BranchFile[]>()
-
+   const [repoFiles, setRepoFiles] = useState<BranchFile[]>()
+   const { setNodes, project: projectPosition } = useReactFlow()
+   
    useEffect(() => {
       (
          async function () {
-            if (project) {
-               const files = await github.listBranchFiles({ username: project.owner, repo: project.repo, branch: 'master' });
-               repoFiles.current = files;
+            if (project && !repoFiles) {
+               const files = await listBranchFiles({ username: project.owner, repo: project.repo, branch: 'master' });
+               setRepoFiles(files);
             }
          })()
-   }, [project])
+   }, [project, repoFiles])
+
+   const onDragOver = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault()
+      event.dataTransfer.dropEffect = "move"
+    }, [])
+
+   const onDrop = useCallback((event: React.DragEvent<HTMLDivElement>) => {
+      event.preventDefault()
+      const dropItem = event.dataTransfer.getData('application/json')
+      const file = JSON.parse(dropItem) as BranchFile
+      const path = file.path ?? '';
+      const position = projectPosition({
+         x: event.clientX,
+         y: event.clientY,
+      });
+
+      const fileNode = createFileNode(file, position)
+
+      if(path){
+         setNodes((current) => [...current, fileNode])
+      }
+   }, [setNodes, projectPosition])
 
    if (!isSignedIn) {
       return null;
@@ -38,19 +68,24 @@ export default function Project() {
 
    return (
       <>
-         <div className="relative w-screen h-screen bg-dark-400">
+         <div className="w-screen h-screen overflow-hidden bg-dark-400">
             <ReactFlow
                nodes={nodes}
+               nodeTypes={nodeTypes}
                onNodesChange={onNodesChange}
-               fitView
-               attributionPosition="bottom-left"
+               proOptions={{ hideAttribution: true }}
+               onDragOver={onDragOver}
+               onDrop={onDrop}
             >
-               <Controls position="bottom-right" />
                <Background color={theme == 'dark' || (theme == 'system' && systemIsDark) ? '#fff' : '#000'} gap={16} />
+               <Controls position="bottom-right" />
             </ReactFlow>
+
 
             <div className="absolute p-2 space-x-2 top-0 left-0 flex">
                <MenuToggle />
+               <BranchSelector repository={project?.repo}/>
+               <FileSelector files={repoFiles}/>
             </div>
 
             <div className="absolute p-2 space-x-2 top-0 right-0 flex items-center">

@@ -12,6 +12,8 @@ export type BranchFile = {
    sha?: string | undefined;
    size?: number | undefined;
    url?: string | undefined;
+   repository: string,
+   owner: string,
 }
 
 export async function listBranchFiles({ username, repo, branch }: { username: string, repo: string, branch: string }) : Promise<BranchFile[]> {
@@ -33,7 +35,7 @@ export async function listBranchFiles({ username, repo, branch }: { username: st
          mediaType: { format: 'raw' }
       });
 
-      return tree.filter((i) => i.type === 'blob');
+      return tree.filter((file) => file.type === 'blob').map(file => ({ ...file, owner: username, repository: repo }));
    }
    catch (error) {
       return []
