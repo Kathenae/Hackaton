@@ -10,7 +10,7 @@ import { useModal } from "./providers/ModalProvider"
 
 export function MenuToggle() {
 
-   const { setModal } = useModal()
+   const { openModal } = useModal()
 
    return (
       <DropdownMenu>
@@ -21,7 +21,7 @@ export function MenuToggle() {
             </Button>
          </DropdownMenuTrigger>
          <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => setModal('create-project')} className="cursor-pointer flex justify-start space-x-2">
+            <DropdownMenuItem onClick={() => openModal('create-project')} className="cursor-pointer flex justify-start space-x-2">
                <Plus className="h-[1.4rem] w-[1.4rem]" />
                <span>Create Project</span>
             </DropdownMenuItem>

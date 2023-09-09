@@ -11,10 +11,10 @@ export type ModalProps = {
 
 type ModalProviderState = {
    modal: ModalName,
-   setModal: (modalName: ModalName) => void,
+   openModal: (modalName: ModalName) => void,
 }
 
-const ModalContext = createContext<ModalProviderState>({ modal: 'inactive', setModal: () => { } })
+const ModalContext = createContext<ModalProviderState>({ modal: 'inactive', openModal: () => { } })
 
 export default function ModalProvider({ children }: PropsWithChildren) {
    const [modal, setModal] = useState<ModalName>('inactive')
@@ -29,7 +29,7 @@ export default function ModalProvider({ children }: PropsWithChildren) {
    }
 
    return (
-      <ModalContext.Provider value={{ modal, setModal }}>
+      <ModalContext.Provider value={{ modal, openModal: setModal }}>
          {children}
          {modal == 'create-project' && <CreateProjectModal open={modal == 'create-project'} onOpenStateChange={(open) => handleToggleModal('create-project', open)} />}
       </ModalContext.Provider>
