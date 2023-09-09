@@ -1,8 +1,8 @@
 export default {
    providers: [
-      {
-         domain: "https://selected-akita-83.clerk.accounts.dev",
-         applicationID: 'convex',
-      }
+     {
+       domain: process.env.CLERK_CONVEX_ISSUER_URL,
+       applicationID: "convex",
+     },
    ]
-}
+ };
