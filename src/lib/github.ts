@@ -5,7 +5,16 @@ export async function listRepos(username: string) {
    return await octokit.rest.repos.listForUser({ username });
 }
 
-export async function listBranchFiles({ username, repo, branch }: { username: string, repo: string, branch: string }) {
+export type BranchFile = {
+   path?: string | undefined;
+   mode?: string | undefined;
+   type?: string | undefined;
+   sha?: string | undefined;
+   size?: number | undefined;
+   url?: string | undefined;
+}
+
+export async function listBranchFiles({ username, repo, branch }: { username: string, repo: string, branch: string }) : Promise<BranchFile[]> {
    try {
       const octokit = new Octokit()
 
