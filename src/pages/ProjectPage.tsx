@@ -2,7 +2,7 @@ import { MenuToggle } from "@/components/MenuToggle";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { ModeToggle } from "@/components/ModeToggle";
 import { UserButton, useUser } from "@clerk/clerk-react"
-import { Background, Controls, Node, ReactFlow, useNodesState, useReactFlow } from 'reactflow'
+import { Background, BackgroundVariant, Controls, Node, ReactFlow, useNodesState, useReactFlow } from 'reactflow'
 import { Id } from "../../convex/_generated/dataModel"
 import { api } from "../../convex/_generated/api";
 import 'reactflow/dist/style.css';
@@ -77,7 +77,7 @@ export default function ProjectPage() {
                onDragOver={onDragOver}
                onDrop={onDrop}
             >
-               <Background color={theme == 'dark' || (theme == 'system' && systemIsDark) ? '#fff' : '#000'} gap={32} />
+               <Background lineWidth={1} variant={BackgroundVariant.Dots} color={theme == 'dark' || (theme == 'system' && systemIsDark) ? '#888' : '#888'} gap={32} />
                <Controls position="bottom-right" />
             </ReactFlow>
 
