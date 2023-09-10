@@ -6,7 +6,8 @@ export default defineSchema({
       name: v.string(),
       owner: v.string(),
       repo: v.string(),
-   }),
+      inviteCode: v.optional(v.string()),
+   }).index('byInviteCode', ['inviteCode']),
    editornodes: defineTable({
       projectId: v.id('projects'),
       expanded: v.boolean(),
@@ -17,4 +18,14 @@ export default defineSchema({
          y: v.number(),
       }),
    }).index('byProjectId', ['projectId']).index('byPath', ['path']),
+   members: defineTable({
+      username: v.string(),
+      projectId: v.id('projects'),
+      editorId: v.optional(v.id('editorNode')),
+      lastseenTimestamp: v.string(),
+      cursorPosition: v.optional(v.object({
+         x: v.number(),
+         y: v.number(),
+      }))
+   }).index('byProjectId', ['projectId']).index('byUsernameAndProjectId', ['username', 'projectId']),
 });
