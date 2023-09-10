@@ -1,4 +1,4 @@
-import { Menu, Plus } from "lucide-react"
+import { Menu, Plus, UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
    DropdownMenu,
@@ -24,6 +24,10 @@ export function MenuToggle() {
             <DropdownMenuItem onClick={() => openModal('create-project')} className="cursor-pointer flex justify-start space-x-2">
                <Plus className="h-[1.4rem] w-[1.4rem]" />
                <span>Create Project</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => openModal('invite-people')} className="cursor-pointer flex justify-start space-x-2">
+               <UserPlus className="h-[1.4rem] w-[1.4rem]" />
+               <span>Invite People</span>
             </DropdownMenuItem>
          </DropdownMenuContent>
       </DropdownMenu>
