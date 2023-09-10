@@ -1,4 +1,4 @@
-import { Menu, Plus, UserPlus } from "lucide-react"
+import { DoorOpen, LucideShieldAlert, Menu, UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
    DropdownMenu,
@@ -7,6 +7,7 @@ import {
    DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
 import { useModal } from "./providers/ModalProvider"
+import { router } from "@/routes"
 
 export function MenuToggle() {
 
@@ -21,13 +22,17 @@ export function MenuToggle() {
             </Button>
          </DropdownMenuTrigger>
          <DropdownMenuContent align="start">
-            <DropdownMenuItem onClick={() => openModal('create-project')} className="cursor-pointer flex justify-start space-x-2">
-               <Plus className="h-[1.4rem] w-[1.4rem]" />
-               <span>Create Project</span>
-            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => openModal('invite-people')} className="cursor-pointer flex justify-start space-x-2">
                <UserPlus className="h-[1.4rem] w-[1.4rem]" />
                <span>Invite People</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => openModal('invite-people')} className="cursor-pointer flex justify-start space-x-2">
+               <LucideShieldAlert className="h-[1.4rem] w-[1.4rem]" />
+               <span>Manage Members</span>
+            </DropdownMenuItem>
+            <DropdownMenuItem onClick={() => router.navigate('/')} className="cursor-pointer flex justify-start space-x-2">
+               <DoorOpen className="h-[1.4rem] w-[1.4rem]" />
+               <span>Home</span>
             </DropdownMenuItem>
          </DropdownMenuContent>
       </DropdownMenu>
