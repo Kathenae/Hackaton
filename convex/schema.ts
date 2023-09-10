@@ -1,5 +1,6 @@
 import { defineSchema, defineTable } from "convex/server";
 import { v } from "convex/values";
+import { Id } from "./_generated/dataModel";
 
 export default defineSchema({
    projects: defineTable({
@@ -27,5 +28,14 @@ export default defineSchema({
          x: v.number(),
          y: v.number(),
       }))
-   }).index('byProjectId', ['projectId']).index('byUsernameAndProjectId', ['username', 'projectId']),
+   }).index('byProjectId', ['projectId']).index('byUsername', ['username']).index('byUsernameAndProjectId', ['username', 'projectId']),
 });
+
+export type Project = {
+   _id: Id<"projects">;
+   _creationTime: number;
+   inviteCode?: string | undefined;
+   name: string;
+   owner: string;
+   repo: string;
+}

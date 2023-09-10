@@ -8,7 +8,7 @@ import {
    DialogTitle,
 } from "@/components/ui/dialog"
 import { Input } from "@/components/ui/input"
-import { ModalProps } from "@/components/providers/ModalProvider"
+import { ModalProps, useModal } from "@/components/providers/ModalProvider"
 import { Select, SelectContent, SelectGroup, SelectItem, SelectLabel, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Form, FormControl, FormField, FormItem, FormLabel, FormMessage } from "@/components/ui/form"
 import { ScrollArea } from "@/components/ui/scroll-area"
@@ -22,6 +22,7 @@ import { useUser } from "@clerk/clerk-react"
 import * as github from '@/lib/github';
 import * as z from "zod"
 import { Loader2 } from "lucide-react"
+import { router } from "@/routes"
 
 const FormSchema = z.object({
    projectName: z.string().min(4).max(23),
@@ -31,7 +32,7 @@ const FormSchema = z.object({
 type FormType = z.infer<typeof FormSchema>
 
 export function CreateProjectModal({ open, onOpenStateChange }: ModalProps) {
-   
+
    const createProject = useMutation(api.projects.createProject)
    const form = useForm<FormType>({
       resolver: zodResolver(FormSchema),
@@ -39,6 +40,7 @@ export function CreateProjectModal({ open, onOpenStateChange }: ModalProps) {
          projectName: '',
       }
    })
+   const { closeModal } = useModal()
    const [isLoading, setLoading] = useState(false)
 
    // Load public repositories for current user from the github API
@@ -60,14 +62,18 @@ export function CreateProjectModal({ open, onOpenStateChange }: ModalProps) {
 
    const onSubmit = async (data: FormType, event: React.BaseSyntheticEvent | undefined) => {
       event?.preventDefault()
-      try{
+      try {
          setLoading(true)
-         await createProject({name: data.projectName, repo: data.repository})
+         const response = await createProject({ name: data.projectName, repo: data.repository })
+         if (response?.projectId) {
+            closeModal()
+            router.navigate('/project/' + response.projectId)
+         }
       }
-      catch(error){
+      catch (error) {
          console.error(error)
       }
-      finally{
+      finally {
          setLoading(false)
       }
    }

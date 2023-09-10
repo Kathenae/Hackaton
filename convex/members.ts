@@ -18,22 +18,51 @@ export const joinProject = mutation({
 
       const user = await ctx.auth.getUserIdentity()
 
+      // Check if user is logged in and... nickname??
       if (!user || !user.nickname) {
-         return
+         return {
+            error: 'You need to be logged in to be able to join the project'
+         }
       }
 
+      // Check if project exists
       const project = await ctx.db.query('projects').withIndex('byInviteCode', (q) => q.eq('inviteCode', inviteCode)).first()
       if (!project) {
-         return
+         return {
+            error: 'Unable to join the project, please check your invite url'
+         }
+      }
+      
+      const member = await ctx.db
+         .query('members')
+         .withIndex('byUsernameAndProjectId', (q) => q.eq('username', user.nickname ?? '').eq('projectId', project._id))
+         .unique()  
+      
+      // Check if user not already member of the project
+      if(member){
+         return {
+            message: 'ALREADY_JOINED',
+            data: {
+               memberId: member._id,
+               projectId: project._id
+            }
+         }
       }
 
+      // if not add new member
       const memberId = await ctx.db.insert('members', {
          username: user.nickname,
          projectId: project._id,
          lastseenTimestamp: new Date().toISOString()
       });
 
-      return memberId;
+      return {
+         message: 'JOINED_SUCCESSFULLY',
+         data: {
+            memberId,
+            projectId: project._id
+         }
+      };
    }
 })
 
