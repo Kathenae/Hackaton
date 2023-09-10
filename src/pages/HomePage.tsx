@@ -3,7 +3,6 @@ import { api } from '../../convex/_generated/api'
 import { useQuery } from "convex/react";
 
 import 'reactflow/dist/style.css';
-import Background from "@/components/Background";
 import { ModeToggle } from "@/components/ModeToggle";
 import { UserButton } from "@clerk/clerk-react";
 import ProjectCard from "@/components/ProjectCard";
@@ -49,7 +48,6 @@ export default function HomePage() {
                   </div>
                </div>
             </div>
-            <Background />
          </div>
       </>
    )
