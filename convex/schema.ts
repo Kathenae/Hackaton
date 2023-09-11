@@ -18,6 +18,12 @@ export default defineSchema({
          x: v.number(),
          y: v.number(),
       }),
+      textPosition: v.optional(v.object({
+         line: v.number(),
+         column: v.number(),
+         scrollTop: v.number(),
+         scrollLeft: v.number(),
+      })),
    }).index('byProjectId', ['projectId']).index('byPath', ['path']),
    members: defineTable({
       username: v.string(),
@@ -38,4 +44,23 @@ export type Project = {
    name: string;
    owner: string;
    repo: string;
+}
+
+export type EditorNodeData = {
+   _id: Id<"editornodes">;
+   _creationTime: number;
+   projectId: Id<"projects">;
+   expanded: boolean;
+   path: string;
+   content: string;
+   position: {
+       x: number;
+       y: number;
+   };
+   textPosition?: {
+      line: number;
+      column: number;
+      scrollTop: number;
+      scrollLeft: number;
+   }
 }

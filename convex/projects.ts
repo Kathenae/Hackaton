@@ -12,10 +12,12 @@ export const get = query({
       }
 
       const editorNodes = await ctx.db.query('editornodes').withIndex('byProjectId', (q) => q.eq('projectId', project._id)).collect()
+      const members = await ctx.db.query('members').withIndex('byProjectId', (q) => q.eq('projectId', project._id)).collect()
 
       return {
          ...project,
          editorNodes,
+         members,
       }
    }
 })
@@ -88,11 +90,32 @@ export const createEditorNode = mutation({
 })
 
 export const updateEditorNode = mutation({
-   args: { id: v.id('editornodes'), content: v.string(), position: v.object({ x: v.number(), y: v.number() }) },
-   handler: async (ctx, { id, content, position }) => {
+   args: { 
+      id: v.id('editornodes'), 
+      content: v.optional(v.string()), 
+      position: v.optional(v.object({ x: v.number(), y: v.number() })), 
+      textPosition: v.optional(v.object({ 
+         line: v.number(), 
+         column: v.number(), 
+         scrollTop: v.number(),
+         scrollLeft: v.number(), 
+      })) 
+   },
+   handler: async (ctx, { id, content, position, textPosition }) => {
       // TODO: Check if user is allowed to update file views
-      // const user = await ctx.auth.getUserIdentity() 
-      await ctx.db.patch(id, { content, position })
+      // const user = await ctx.auth.getUserIdentity()
+
+      if (content) {
+         await ctx.db.patch(id, { content })
+      }
+
+      if (position) {
+         await ctx.db.patch(id, { position })
+      }
+
+      if (textPosition) {
+         await ctx.db.patch(id, { textPosition })
+      }
    }
 })
 

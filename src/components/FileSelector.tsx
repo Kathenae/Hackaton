@@ -24,6 +24,7 @@ const extensionToIconClassMap = {
    ".java": "i-mdi-language-java",
    ".cpp": "i-mdi-language-cpp",
    ".css": "i-mdi-language-css3",
+   ".cs": "i-mdi-language-csharp",
    ".html": "i-mdi-language-html5",
    ".php": "i-mdi-language-php",
    ".rb": "i-mdi-language-ruby",
