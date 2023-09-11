@@ -5,30 +5,30 @@ Built for the [Web Dev Cody Hackaton](https://hackathon.webdevcody.com), CodeTog
 ![Preview Image](https://media.discordapp.net/attachments/1146254904982253568/1150133350477074562/image.png?width=1031&height=494)
 
 <div style="display: flex; justify-content: center; width: 100%;">
-   <div style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
+   <figure style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
       <img width="50" height="50" src="https://www.typescriptlang.org/favicon-32x32.png?v=8944a05a8b601855de116c8a56d3b3ae">
-      <h4>Typescript<h4>
-   </div>
-   <div style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
+      <figcaption>Typescript<figcaption>
+   </figure>
+   <figure style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
       <img width="50" height="50" src="https://react.dev/favicon.ico">
-      <h4>React<h4>
-   </div>
-   <div style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
+      <figcaption>React<figcaption>
+   </figure>
+   <figure style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
       <img width="50" height="50" src="https://www.convex.dev/favicon.ico">
-      <h4>Convex<h4>
-   </div>
-   <div style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
+      <figcaption>Convex<figcaption>
+   </figure>
+   <figure style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
       <img width="50" height="50" src="https://clerk.com/favicon/favicon-32x32.png">
-      <h4>Clerk Auth<h4>
-   </div>
-   <div style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
+      <figcaption>Clerk Auth<figcaption>
+   </figure>
+   <figure style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
       <img width="50" height="50" src="https://ui.shadcn.com/favicon.ico">
-      <h4>Shadcn UI<h4>
-   </div>
-   <div style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
+      <figcaption>Shadcn UI<figcaption>
+   </figure>
+   <figure style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
       <img width="50" height="50" src="https://tailwindcss.com/favicons/favicon-32x32.png?v=3">
-      <h4>Tailwind CSS<h4>
-   </div>
+      <figcaption>Tailwind CSS<figcaption>
+   </figure>
 </div>
 
 ## Features
