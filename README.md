@@ -5,27 +5,27 @@ Built for the [Web Dev Cody Hackaton](https://hackathon.webdevcody.com), CodeTog
 ![Preview Image](https://media.discordapp.net/attachments/1146254904982253568/1150133350477074562/image.png?width=1031&height=494)
 
 <div style="display: flex; justify-content: center; width: 100%;">
-   <figure style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
+   <figure>
       <img width="50" height="50" src="https://www.typescriptlang.org/favicon-32x32.png?v=8944a05a8b601855de116c8a56d3b3ae">
       <figcaption>Typescript<figcaption>
    </figure>
-   <figure style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
+   <figure>
       <img width="50" height="50" src="https://react.dev/favicon.ico">
       <figcaption>React<figcaption>
    </figure>
-   <figure style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
+   <figure>
       <img width="50" height="50" src="https://www.convex.dev/favicon.ico">
       <figcaption>Convex<figcaption>
    </figure>
-   <figure style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
+   <figure>
       <img width="50" height="50" src="https://clerk.com/favicon/favicon-32x32.png">
       <figcaption>Clerk Auth<figcaption>
    </figure>
-   <figure style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
+   <figure>
       <img width="50" height="50" src="https://ui.shadcn.com/favicon.ico">
       <figcaption>Shadcn UI<figcaption>
    </figure>
-   <figure style="display: flex; justify-content: center; flex-direction: column; margin-right: 30px">
+   <figure>
       <img width="50" height="50" src="https://tailwindcss.com/favicons/favicon-32x32.png?v=3">
       <figcaption>Tailwind CSS<figcaption>
    </figure>
