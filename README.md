@@ -51,7 +51,7 @@ Its easy, just:
 #### TODO (Soon)
 - [x] Remove Members
 - [x] Leave Project
-- [ ] Presense (See who's online)
+- [x] Presense (See who's online)
 - [ ] Code Presense (See who's editing what)
 - [ ] Better Authorization (Only Project owner should be able to invite or remove members)
 - [ ] Better error handling for when user is offline (clerk or convex servers unreashable)
