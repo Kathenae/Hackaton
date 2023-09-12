@@ -24,7 +24,7 @@ export function InvitePeopleModal({ open, onOpenStateChange }: ModalProps) {
    const [isLoading, setLoading] = useState(false)
    const { closeModal } = useModal()
    const { id } = useParams<{ id: string }>()
-   const project = useQuery(api.projects.get, { id: id as Id<"projects"> })
+   const project = useQuery(api.projects.getForUser, { id: id as Id<"projects"> })
    const generateInviteCode = useMutation(api.members.generateInviteCode)
 
    const onCopy = () => {

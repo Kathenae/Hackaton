@@ -14,6 +14,8 @@ import { FileSelector } from "@/components/FileSelector";
 import BranchSelector from "@/components/BranchSelector";
 import EditorNode from "@/components/EditorNode";
 import Controls from "@/components/Controls";
+import MembersList from "@/components/MembersList";
+import { router } from "@/routes";
 
 const initialNodes: Node[] = []
 const nodeTypes = {
@@ -24,7 +26,7 @@ export default function ProjectPage() {
 
    const { isSignedIn } = useUser()
    const { id } = useParams<{ id: string }>()
-   const project = useQuery(api.projects.get, { id: id as Id<"projects"> })
+   const project = useQuery(api.projects.getForUser, { id: id as Id<"projects"> })
    const createEditorNode = useMutation(api.projects.createEditorNode)
    // const updateEditorNode = useMutation(api.projects.updateEditorNode)
 
@@ -37,8 +39,14 @@ export default function ProjectPage() {
    useEffect(() => {
       (
          async function () {
-            if (project && !repoFiles) {
-               const files = await listBranchFiles({ username: project.owner, repo: project.repo, branch: 'master' });
+
+            if(project === null){
+               router.navigate('/')
+               return;
+            }
+
+            if (project && project.owner && !repoFiles) {
+               const files = await listBranchFiles({ username: project.owner?.username, repo: project.repo, branch: 'master' });
                setRepoFiles(files);
             }
          })()
@@ -130,6 +138,10 @@ export default function ProjectPage() {
             <div className="absolute p-2 space-x-2 top-0 right-0 flex items-center">
                <ModeToggle />
                <UserButton />
+            </div>
+
+            <div className="absolute top-0 left-96 p-2">
+               <MembersList project={project} />
             </div>
          </div>
       </>

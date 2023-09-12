@@ -16,6 +16,7 @@ import type {
 } from "convex/server";
 import type * as members from "../members";
 import type * as projects from "../projects";
+import type * as users from "../users";
 
 /**
  * A utility for referencing Convex functions in your app's API.
@@ -28,6 +29,7 @@ import type * as projects from "../projects";
 declare const fullApi: ApiFromModules<{
   members: typeof members;
   projects: typeof projects;
+  users: typeof users;
 }>;
 export declare const api: FilterApi<
   typeof fullApi,

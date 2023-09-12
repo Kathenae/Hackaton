@@ -1,6 +1,7 @@
 import { mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { v4 as uuidv4 } from 'uuid';
+import * as users from "./users";
 
 export const generateInviteCode = mutation({
    args: { projectId: v.id('projects') },
@@ -15,10 +16,10 @@ export const joinProject = mutation({
    args: { inviteCode: v.string() },
    handler: async (ctx, { inviteCode }) => {
 
-      const user = await ctx.auth.getUserIdentity()
+      const user = await users.current(ctx)
 
-      // Check if user is logged in and... nickname??
-      if (!user || !user.nickname) {
+      // Check if user is logged
+      if (!user) {
          return {
             error: 'You need to be logged in to be able to join the project'
          }
@@ -34,7 +35,7 @@ export const joinProject = mutation({
       
       const member = await ctx.db
          .query('members')
-         .withIndex('byUsernameAndProjectId', (q) => q.eq('username', user.nickname ?? '').eq('projectId', project._id))
+         .withIndex('byUserIdAndProjectId', (q) => q.eq('userId', user._id).eq('projectId', project._id))
          .unique()  
       
       // Check if user not already member of the project
@@ -50,7 +51,7 @@ export const joinProject = mutation({
 
       // if not add new member
       const memberId = await ctx.db.insert('members', {
-         username: user.nickname,
+         userId: user._id,
          projectId: project._id,
          lastseenTimestamp: new Date().toISOString()
       });
@@ -69,14 +70,14 @@ export const updatePresense = mutation({
    args: {projectId: v.id('projects')},
    handler: async (ctx, { projectId }) => {
 
-      const user = await ctx.auth.getUserIdentity()
-      if (!user || !user.nickname) {
+      const user = await users.current(ctx)
+      if (!user) {
          return
       }
 
       const member = await ctx.db
          .query('members')
-         .withIndex('byUsernameAndProjectId', (q) => q.eq('username', user.nickname ?? '').eq('projectId', projectId))
+         .withIndex('byUserIdAndProjectId', (q) => q.eq('userId', user._id).eq('projectId', projectId))
          .unique()    
    
       if(!member){
@@ -105,15 +106,15 @@ export const remove = mutation({
 export const leave = mutation({
    args: { projectId: v.id('projects') },
    handler: async (ctx, { projectId }) => {
-      const user = await ctx.auth.getUserIdentity()
+      const user = await users.current(ctx)
 
-      if(!user || !user.nickname){
+      if(!user){
          return {
             error: "UNAUTHENTICATED"
          }
       }
 
-      const member = await ctx.db.query('members').withIndex('byUsernameAndProjectId', (q) => q.eq('username', user.nickname ?? '').eq('projectId', projectId)).first()
+      const member = await ctx.db.query('members').withIndex('byUserIdAndProjectId', (q) => q.eq('userId', user._id).eq('projectId', projectId)).first()
       
       if(!member){
          return {

@@ -10,16 +10,16 @@ import { useModal } from "./providers/ModalProvider"
 import { router } from "@/routes"
 import { api } from "convex/_generated/api"
 import { useQuery } from "convex/react"
-import { useUser } from "@clerk/clerk-react"
+import { useStoredUser } from "./providers/StoredUserProvider"
 
 type MenuToggleProps = {
-   project: ReturnType<typeof useQuery<typeof api.projects.get>>
+   project: ReturnType<typeof useQuery<typeof api.projects.getForUser>>
 }
 
 export function MenuToggle({ project }: MenuToggleProps) {
 
    const { openModal } = useModal()
-   const {user} = useUser()
+   const { user } = useStoredUser()
 
    return (
       <DropdownMenu>
@@ -38,13 +38,13 @@ export function MenuToggle({ project }: MenuToggleProps) {
                <UserPlus className="h-[1.4rem] w-[1.4rem]" />
                <span>Invite People</span>
             </DropdownMenuItem>
-            {(project?.owner == user?.username) &&
+            {(project?.ownerId == user?._id) &&
                <DropdownMenuItem onClick={() => openModal('manage-members', project)} className="cursor-pointer flex justify-start space-x-2">
                   <LucideShieldAlert className="h-[1.4rem] w-[1.4rem]" />
                   <span>Manage Members</span>
                </DropdownMenuItem>
             }
-            {(project?.owner != user?.username) &&
+            {(project?.ownerId != user?._id) &&
                <DropdownMenuItem onClick={() => openModal('leave-project', project)} className="cursor-pointer text-rose-500 flex justify-start space-x-2">
                   <DoorOpen className="h-[1.4rem] w-[1.4rem]" />
                   <span>Leave Project</span>

@@ -20,15 +20,13 @@ import { api } from '../../../convex/_generated/api';
 import { Id } from '../../../convex/_generated/dataModel';
 import { Member } from '../../../convex/schema';
 import { UserAvatar } from '../UserAvatar';
-import { useUser } from '@clerk/clerk-react';
 import { useParams } from 'react-router-dom';
 
 export default function ManageMembersModal({ open, onOpenStateChange, children }: ModalProps) {
 
    const [loadingId, setLoadingId] = useState<string | false>(false)
    const { id } = useParams()
-   const project = useQuery(api.projects.get, {id: id as Id<'projects'>})
-   const { user } = useUser()
+   const project = useQuery(api.projects.getForUser, {id: id as Id<'projects'>})
    const removeMember = useMutation(api.members.remove)
 
    const onRemove = async (member: Member) => {
@@ -59,13 +57,13 @@ export default function ManageMembersModal({ open, onOpenStateChange, children }
             <ScrollArea className='mt-8 max-h-[420px] pr-6'>
                {project?.members?.map((member) => (
                   <div key={member._id} className='flex items-center gap-x-2 mb-6'>
-                     <UserAvatar src='https://github.com/shadcn.png' />
+                     <UserAvatar src={member.user?.avatarUrl} />
                      <div className="flex flex-col gap-y-2">
                         <div className="font-semibold flex items-center">
-                           <span className='mr-2'>{member.username}</span>
+                           <span className='mr-2'>{member.user?.username}</span>
                         </div>
                      </div>
-                     {(project.owner !== user?.username && loadingId !== member._id) &&
+                     {(project.ownerId !== member.user?._id && loadingId !== member._id) &&
                         <div className='ml-auto'>
                            <DropdownMenu>
                               <DropdownMenuTrigger>

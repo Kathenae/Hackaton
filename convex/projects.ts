@@ -2,30 +2,61 @@ import { mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { Project } from "./schema";
 import { v4 as uuidv4 } from 'uuid';
+import * as users from "./users";
 
-export const get = query({
+export const getForUser = query({
    args: {id: v.id('projects')},
    handler: async (ctx, {id}) => {
+
+      const user = await users.current(ctx);
+
+      if (!user) {
+         return null;
+      }
+
       const project = await ctx.db.get(id);
       if(!project){
          return null;
       }
 
+      const projectOwner = await ctx.db.get(project.ownerId);
       const editorNodes = await ctx.db.query('editornodes').withIndex('byProjectId', (q) => q.eq('projectId', project._id)).collect()
-      const members = await ctx.db.query('members').withIndex('byProjectId', (q) => q.eq('projectId', project._id)).collect()
+      const membersWithUser = await Promise.all(
+         (await ctx.db.query('members').withIndex('byProjectId', (q) => q.eq('projectId', project._id)).collect()).map(
+            async (member) => {
+               const user = await ctx.db.get(member.userId);
+
+               return {
+                  ...member,
+                  user,
+               }
+            })
+      )
+
+      // Check if user is project member
+      if (!membersWithUser.find(m => m.userId == user._id)) {
+         return null;
+      }
 
       return {
          ...project,
          editorNodes,
-         members,
+         owner: projectOwner,
+         members: membersWithUser,
       }
    }
 })
 
 export const listForUser = query({
    handler: async (ctx) => {
-      const user = await ctx.auth.getUserIdentity();
-      const memberships = await ctx.db.query('members').withIndex('byUsername', q => q.eq('username', user?.nickname ?? '')).collect()
+      
+      const user = await users.current(ctx)
+
+      if(!user){
+         return
+      }
+
+      const memberships = await ctx.db.query('members').withIndex('byUserId', q => q.eq('userId', user._id)).collect()
       const joinedProjects = await Promise.all(
          memberships.map(async (membership) => await ctx.db.get(membership.projectId))
       );
@@ -44,11 +75,16 @@ export const listForUser = query({
 export const createProject = mutation({
    args: { name: v.string(), repo: v.string(), },
    handler: async (ctx, { name, repo }) => {
-      const user = await ctx.auth.getUserIdentity()
-      if(user?.nickname){
+      const user = await users.current(ctx)
+
+      if(!user){
+         return
+      }
+
+      if(user){
          const inviteCode = uuidv4();
-         const projectId = await ctx.db.insert("projects", { owner: user.nickname, name, repo, inviteCode });
-         await ctx.db.insert('members', {username: user.nickname, projectId, lastseenTimestamp: new Date().toISOString()});
+         const projectId = await ctx.db.insert("projects", { ownerId: user._id, name, repo, inviteCode });
+         await ctx.db.insert('members', {userId: user._id, projectId, lastseenTimestamp: new Date().toISOString()});
          
          return {
             projectId

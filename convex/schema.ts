@@ -3,9 +3,16 @@ import { v } from "convex/values";
 import { Id } from "./_generated/dataModel";
 
 export default defineSchema({
+   users: defineTable({
+      name: v.string(),
+      username: v.string(),
+      tokenIdentifier: v.string(),
+      avatarUrl: v.optional(v.string()),
+      lastSeenTimestamp: v.string(),
+   }).index('ByToken', ['tokenIdentifier']),
    projects: defineTable({
       name: v.string(),
-      owner: v.string(),
+      ownerId: v.id("users"),
       repo: v.string(),
       inviteCode: v.optional(v.string()),
    }).index('byInviteCode', ['inviteCode']),
@@ -26,7 +33,7 @@ export default defineSchema({
       })),
    }).index('byProjectId', ['projectId']).index('byPath', ['path']),
    members: defineTable({
-      username: v.string(),
+      userId: v.id('users'),
       projectId: v.id('projects'),
       editorId: v.optional(v.id('editornodes')),
       lastseenTimestamp: v.string(),
@@ -34,7 +41,7 @@ export default defineSchema({
          x: v.number(),
          y: v.number(),
       }))
-   }).index('byProjectId', ['projectId']).index('byUsername', ['username']).index('byUsernameAndProjectId', ['username', 'projectId']),
+   }).index('byProjectId', ['projectId']).index('byUserId', ['userId']).index('byUserIdAndProjectId', ['userId', 'projectId']),
 });
 
 export type Project = {
@@ -42,7 +49,7 @@ export type Project = {
    _creationTime: number;
    inviteCode?: string | undefined;
    name: string;
-   owner: string;
+   ownerId: Id<"users">;
    repo: string;
 }
 
@@ -73,7 +80,7 @@ export type Member = {
       x: number;
       y: number;
    } | undefined;
+   userId: Id<"users">;
    projectId: Id<"projects">;
-   username: string;
    lastseenTimestamp: string;
 }

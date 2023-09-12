@@ -1,3 +1,7 @@
+.cl-card{
+   @apply border-border
+}
+
 .dark .cl-card{
    @apply bg-background text-foreground;
 }
