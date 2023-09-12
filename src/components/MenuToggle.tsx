@@ -8,10 +8,18 @@ import {
 } from "@/components/ui/dropdown-menu"
 import { useModal } from "./providers/ModalProvider"
 import { router } from "@/routes"
+import { api } from "convex/_generated/api"
+import { useQuery } from "convex/react"
+import { useUser } from "@clerk/clerk-react"
 
-export function MenuToggle() {
+type MenuToggleProps = {
+   project: ReturnType<typeof useQuery<typeof api.projects.get>>
+}
+
+export function MenuToggle({ project }: MenuToggleProps) {
 
    const { openModal } = useModal()
+   const {user} = useUser()
 
    return (
       <DropdownMenu>
@@ -26,10 +34,12 @@ export function MenuToggle() {
                <UserPlus className="h-[1.4rem] w-[1.4rem]" />
                <span>Invite People</span>
             </DropdownMenuItem>
-            <DropdownMenuItem onClick={() => openModal('invite-people')} className="cursor-pointer flex justify-start space-x-2">
+            {project?.owner == user?.username &&
+               <DropdownMenuItem onClick={() => openModal('manage-members', project)} className="cursor-pointer flex justify-start space-x-2">
                <LucideShieldAlert className="h-[1.4rem] w-[1.4rem]" />
                <span>Manage Members</span>
             </DropdownMenuItem>
+            }
             <DropdownMenuItem onClick={() => router.navigate('/')} className="cursor-pointer flex justify-start space-x-2">
                <DoorOpen className="h-[1.4rem] w-[1.4rem]" />
                <span>Home</span>

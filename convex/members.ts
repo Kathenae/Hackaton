@@ -2,7 +2,6 @@ import { mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { v4 as uuidv4 } from 'uuid';
 
-
 export const generateInviteCode = mutation({
    args: { projectId: v.id('projects') },
    handler: async (ctx, { projectId }) => {
@@ -86,5 +85,19 @@ export const updatePresense = mutation({
 
       ctx.db.patch(member._id, { lastseenTimestamp: new Date().toISOString() });
 
+   }
+})
+
+export const remove = mutation({
+   args: {
+      id: v.id('members')
+   },
+   handler: async (ctx, {id}) => {
+      // TOOD: Check if user is allowd to remove members
+      await ctx.db.delete(id)
+      return {
+         statusOk: true,
+         message: "MEMBER_REMOVED"
+      }
    }
 })

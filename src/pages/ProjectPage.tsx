@@ -122,7 +122,7 @@ export default function ProjectPage() {
 
 
             <div className="absolute p-2 space-x-2 top-0 left-0 flex">
-               <MenuToggle />
+               <MenuToggle project={project}/>
                <BranchSelector repository={project?.repo}/>
                <FileSelector files={repoFiles}/>
             </div>

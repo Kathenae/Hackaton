@@ -28,7 +28,7 @@ export default defineSchema({
    members: defineTable({
       username: v.string(),
       projectId: v.id('projects'),
-      editorId: v.optional(v.id('editorNode')),
+      editorId: v.optional(v.id('editornodes')),
       lastseenTimestamp: v.string(),
       cursorPosition: v.optional(v.object({
          x: v.number(),
@@ -63,4 +63,17 @@ export type EditorNodeData = {
       scrollTop: number;
       scrollLeft: number;
    }
+}
+
+export type Member = {
+   _id: Id<"members">;
+   _creationTime: number;
+   editorId?: Id<"editornodes"> | undefined;
+   cursorPosition?: {
+      x: number;
+      y: number;
+   } | undefined;
+   projectId: Id<"projects">;
+   username: string;
+   lastseenTimestamp: string;
 }

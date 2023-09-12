@@ -1,14 +1,15 @@
-import { createContext, useState, useContext } from "react";
+import { createContext, useState, useContext, useRef } from "react";
 import type { PropsWithChildren } from "react";
 import { CreateProjectModal } from "../modals/CreateProjectModal";
 import { InvitePeopleModal } from "../modals/InvitePeopleModal";
+import ManageMembersModal from "../modals/ManageMembersModal";
 
-type ModalName = "inactive" | 'create-project' | 'invite-people'
+type ModalName = "inactive" | 'create-project' | 'invite-people' | 'manage-members'
 
-export type ModalProps = {
+export type ModalProps = PropsWithChildren<{
    open: boolean,
    onOpenStateChange: (open: boolean) => void
-}
+}>
 
 type ModalProviderState = {
    modal: ModalName,
@@ -20,7 +21,7 @@ const ModalContext = createContext<ModalProviderState>({ modal: 'inactive', open
 
 export default function ModalProvider({ children }: PropsWithChildren) {
    const [modal, setModal] = useState<ModalName>('inactive')
-   const [data, setData] = useState<unknown>();
+   const dataRef = useRef<unknown>()
 
    const onOpenStateChange = (changedModal: ModalName, open: boolean) => {
       if (!open && changedModal == modal) {
@@ -33,7 +34,7 @@ export default function ModalProvider({ children }: PropsWithChildren) {
 
    const openModal = (modal: ModalName, data? : unknown) => {
       setModal(modal);
-      setData(data);
+      dataRef.current = data
   }
 
    const ModalMap = (ModalComponent: React.FC<ModalProps>, target: ModalName) => {
@@ -43,18 +44,19 @@ export default function ModalProvider({ children }: PropsWithChildren) {
    }
 
    return (
-      <ModalContext.Provider value={{ modal, data, openModal }}>
+      <ModalContext.Provider value={{ modal, data: dataRef.current, openModal }}>
          <>
             {children}
             {ModalMap(CreateProjectModal, 'create-project')}
             {ModalMap(InvitePeopleModal, 'invite-people')}
+            {ModalMap(ManageMembersModal, 'manage-members')}
          </>
       </ModalContext.Provider>
    )
 }
 
 // eslint-disable-next-line react-refresh/only-export-components
-export function useModal() {
+export function useModal<T>() {
    const modal = useContext(ModalContext);
 
    const closeModal = () => {
@@ -63,6 +65,7 @@ export function useModal() {
    
    return {
       ...modal,
+      data: modal.data as T,
       closeModal,
    }
 }
