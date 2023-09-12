@@ -49,11 +49,12 @@ Its easy, just:
 - Create a `.env.local` with CONVEX_DEPLOYMENT and VITE_CONVEX_URL variables (npx convex dev should have created this for you)
 - `npm run dev`
 #### TODO (Soon)
-- [ ] Delete Members
-- [ ] Leave Project
+- [x] Remove Members
+- [x] Leave Project
 - [ ] Presense (See who's online)
 - [ ] Code Presense (See who's editing what)
 - [ ] Better Authorization (Only Project owner should be able to invite or remove members)
+- [ ] Better error handling for when user is offline (clerk or convex servers unreashable)
 
 #### TODO (Dauting)
 - [ ] Branches, Commits And PR Support

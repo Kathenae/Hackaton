@@ -101,3 +101,26 @@ export const remove = mutation({
       }
    }
 })
+
+export const leave = mutation({
+   args: { projectId: v.id('projects') },
+   handler: async (ctx, { projectId }) => {
+      const user = await ctx.auth.getUserIdentity()
+
+      if(!user || !user.nickname){
+         return {
+            error: "UNAUTHENTICATED"
+         }
+      }
+
+      const member = await ctx.db.query('members').withIndex('byUsernameAndProjectId', (q) => q.eq('username', user.nickname ?? '').eq('projectId', projectId)).first()
+      
+      if(!member){
+         return {
+            error: "NOT_A_MEMBER"
+         }
+      }
+
+      await ctx.db.delete(member._id)
+   },
+})

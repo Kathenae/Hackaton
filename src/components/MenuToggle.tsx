@@ -1,4 +1,4 @@
-import { DoorOpen, LucideShieldAlert, Menu, UserPlus } from "lucide-react"
+import { DoorOpen, Home, LucideShieldAlert, Menu, UserPlus } from "lucide-react"
 import { Button } from "@/components/ui/button"
 import {
    DropdownMenu,
@@ -30,20 +30,26 @@ export function MenuToggle({ project }: MenuToggleProps) {
             </Button>
          </DropdownMenuTrigger>
          <DropdownMenuContent align="start">
+            <DropdownMenuItem onClick={() => router.navigate('/')} className="cursor-pointer flex justify-start space-x-2">
+               <Home className="h-[1.4rem] w-[1.4rem]" />
+               <span>Home</span>
+            </DropdownMenuItem>
             <DropdownMenuItem onClick={() => openModal('invite-people')} className="cursor-pointer flex justify-start space-x-2">
                <UserPlus className="h-[1.4rem] w-[1.4rem]" />
                <span>Invite People</span>
             </DropdownMenuItem>
-            {project?.owner == user?.username &&
+            {(project?.owner == user?.username) &&
                <DropdownMenuItem onClick={() => openModal('manage-members', project)} className="cursor-pointer flex justify-start space-x-2">
-               <LucideShieldAlert className="h-[1.4rem] w-[1.4rem]" />
-               <span>Manage Members</span>
-            </DropdownMenuItem>
+                  <LucideShieldAlert className="h-[1.4rem] w-[1.4rem]" />
+                  <span>Manage Members</span>
+               </DropdownMenuItem>
             }
-            <DropdownMenuItem onClick={() => router.navigate('/')} className="cursor-pointer flex justify-start space-x-2">
-               <DoorOpen className="h-[1.4rem] w-[1.4rem]" />
-               <span>Home</span>
-            </DropdownMenuItem>
+            {(project?.owner != user?.username) &&
+               <DropdownMenuItem onClick={() => openModal('leave-project', project)} className="cursor-pointer text-rose-500 flex justify-start space-x-2">
+                  <DoorOpen className="h-[1.4rem] w-[1.4rem]" />
+                  <span>Leave Project</span>
+               </DropdownMenuItem>
+            }
          </DropdownMenuContent>
       </DropdownMenu>
    )
