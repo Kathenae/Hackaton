@@ -19,8 +19,10 @@ export default defineSchema({
    editornodes: defineTable({
       projectId: v.id('projects'),
       expanded: v.boolean(),
+      branch: v.string(),
       path: v.string(),
       content: v.string(),
+      sha: v.optional(v.string()),
       position: v.object({
          x: v.number(),
          y: v.number(),
@@ -58,8 +60,10 @@ export type EditorNodeData = {
    _creationTime: number;
    projectId: Id<"projects">;
    expanded: boolean;
-   path: string;
-   content: string;
+   branch: string,
+   path: string,
+   content: string,
+   sha?: string,
    position: {
        x: number;
        y: number;

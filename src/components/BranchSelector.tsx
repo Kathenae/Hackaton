@@ -4,27 +4,21 @@ import { Popover, PopoverContent, PopoverTrigger } from "./ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "./ui/command"
 import { cn } from "@/lib/utils"
 import { useState } from "react"
+import { Branch, Branches } from "@/lib/github"
 
 type BranchSelectorProps = {
    repository?: string,
+   branches?: Branches,
+   currentBranch: Branch | undefined,
+   onBranchSelected: (branch?: Branch) => void
 }
 
-const branches = [
-   "Master",
-   "Production",
-   "Staging",
-   "Alpha",
- ];
-
-export default function BranchSelector({ repository }: BranchSelectorProps) {
-
+export default function BranchSelector({ repository, branches, currentBranch, onBranchSelected }: BranchSelectorProps) {
    const [open, setOpen] = useState(false)
-   const [value, setValue] = useState("master")
 
-   const handleSelect = (currentValue: string) => {
-      console.log(currentValue)
-      console.log(branches)
-      setValue(currentValue)
+   const handleSelect = (branchName: string) => {
+      const selectedBranch = branches?.find(b => b.name.toLowerCase() == branchName.toLowerCase());
+      onBranchSelected(selectedBranch)
       setOpen(false)
    }
 
@@ -36,12 +30,10 @@ export default function BranchSelector({ repository }: BranchSelectorProps) {
                   variant="outline"
                   role="combobox"
                   aria-expanded={open}
-                  className="w-[268px] justify-between overflow-clip"
+                  className="w-[268px] flex justify-between whitespace-nowrap overflow-clip"
                >
                   <GitBranch className="mr-2 h-4 w-4 shrink-0 opacity-50"/>
-                  {value
-                     ? `${branches.find((branch) => branch.toLowerCase() === value)} (${repository})`
-                     : repository}
+                  {currentBranch? `${currentBranch.name} (${repository})`: repository}
                   <ChevronsUpDown className="ml-auto h-4 w-4 shrink-0 opacity-50" />
                </Button>
             </PopoverTrigger>
@@ -50,19 +42,19 @@ export default function BranchSelector({ repository }: BranchSelectorProps) {
                   <CommandInput placeholder="Search framework..." />
                   <CommandEmpty>No branch found.</CommandEmpty>
                   <CommandGroup>
-                     {branches.map((branch) => (
+                     {branches?.map((branch) => (
                         <CommandItem
-                           key={branch}
+                           key={branch.name}
                            onSelect={handleSelect}
                            className="flex overflow-clip"
                         >
                            <Check
                               className={cn(
                                  "mr-2 h-4 w-4",
-                                 value === branch.toLowerCase() ? "opacity-100" : "opacity-0"
+                                 currentBranch?.name === branch.name? "opacity-100" : "opacity-0"
                               )}
                            />
-                           {branch}
+                           {branch.name}
                         </CommandItem>
                      ))}
                   </CommandGroup>

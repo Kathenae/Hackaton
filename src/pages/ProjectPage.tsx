@@ -9,7 +9,7 @@ import 'reactflow/dist/style.css';
 import { useParams } from "react-router-dom";
 import { useMutation, useQuery, } from "convex/react";
 import { useCallback, useEffect, useState } from "react";
-import {BranchFile, getRepoFileContent, listBranchFiles} from "@/lib/github";
+import {Branch, BranchFile, Branches, getMainBranch, getRepoFileContent, listBranchFiles, listBranches} from "@/lib/github";
 import { FileSelector } from "@/components/FileSelector";
 import BranchSelector from "@/components/BranchSelector";
 import EditorNode from "@/components/EditorNode";
@@ -33,32 +33,51 @@ export default function ProjectPage() {
 
    const [nodes, , onNodesChange] = useNodesState(initialNodes);
    const { theme, systemIsDark } = useTheme()
+   const [branches, setBranches] = useState<Branches>()
+   const [currentBranch, setCurrentBranch] = useState<Branch>()
    const [repoFiles, setRepoFiles] = useState<BranchFile[]>()
    const { setNodes, project: projectPosition, getNode, getZoom } = useReactFlow()
    
-   // Load repo files from github
+   // On Project changes
    useEffect(() => {
       (
          async function () {
-
             if(project === null){
+               // Project is invalid, return home
                router.navigate('/')
                return;
             }
 
-            if (project && project.owner && !repoFiles) {
-               const files = await listBranchFiles({ username: project.owner?.username, repo: project.repo, branch: 'master' });
-               setRepoFiles(files);
+            if (project && project.owner) {
+               const { data: branches } = await listBranches({ username: project.owner.username, repo: project.repo })
+               let branch = getMainBranch(branches)
+
+               if(!currentBranch){
+                  setCurrentBranch(branch)
+               }
+               else{
+                  branch = currentBranch
+               }
+
+               // if we have a branch
+               if (branch) {
+                  const files = await listBranchFiles({ username: project.owner?.username, repo: project.repo, branch: branch.name });
+                  setRepoFiles(files);
+                  setBranches(branches)
+               }
+               else{
+                  alert('Unable to load the main branch from this repo')
+               }
             }
          })()
-   }, [project, repoFiles])
+   }, [project, currentBranch])
 
    // Render editor nodes
    useEffect(() => {
       (
          async () => {
             if(project?.editorNodes){
-               const nodes = project.editorNodes.map((editor) => {
+               const nodes = project.editorNodes.filter(editor => editor.branch === currentBranch?.name).map((editor) => {
                   const position = editor.position;
                   return {
                      id: editor._id,
@@ -72,7 +91,7 @@ export default function ProjectPage() {
             }
          }
       )()
-   }, [id, project, setNodes, getNode])
+   }, [id, project, currentBranch, setNodes, getNode])
 
    const onDragOver = useCallback(async (event: React.DragEvent<HTMLDivElement>) => {
       event.preventDefault()
@@ -95,18 +114,30 @@ export default function ProjectPage() {
       }
 
       // Check if there's already an editor node for this file
-      if(project.editorNodes.find(e => e.path === path)){
-         alert('File already added');
+      if(project.editorNodes.find(e => e.path === path && e.branch === currentBranch?.name)){
+         alert('Editor for this file already added, select the branch if you do not see it in your viewport');
          return
       }
 
-      const content = await getRepoFileContent({ username: file.owner, repo: file.repository, path })
-
-      if(typeof content === 'string'){
-         await createEditorNode({projectId: project._id, content, position, path})
+      if(!currentBranch){
+         alert('Branch not selected');
+         return
       }
 
-   }, [project, createEditorNode, projectPosition])
+      const content = await getRepoFileContent({ username: file.owner, repo: file.repository, path, branchName: currentBranch.name })
+
+      if (typeof content === 'string') {
+         await createEditorNode({ 
+            projectId: project._id, 
+            content, 
+            branch: currentBranch.name, 
+            sha: file.sha, 
+            position, 
+            path,
+         })
+      }
+
+   }, [project, currentBranch, createEditorNode, projectPosition])
 
    const onNodeDragStart = (event: React.MouseEvent<Element, MouseEvent>, node: Node<EditorNodeData, string | undefined>) => {
       event.preventDefault();
@@ -118,7 +149,13 @@ export default function ProjectPage() {
       updateEditorNode({ id: node.data._id, position: node.position })
    }
 
-   // Still loading
+   const onBranchSelected = (branch: Branch | undefined) => {
+      if(branch){
+         setCurrentBranch(branch)
+      }
+   }
+
+   // Still loading project
    if(project === undefined){
       return (
          <div className="w-screen h-screen flex items-center justify-center">
@@ -152,7 +189,12 @@ export default function ProjectPage() {
 
             <div className="absolute p-2 space-x-2 top-0 left-0 flex">
                <MenuToggle project={project}/>
-               <BranchSelector repository={project?.repo}/>
+               <BranchSelector 
+                  branches={branches} 
+                  repository={project?.repo} 
+                  currentBranch={currentBranch}
+                  onBranchSelected={onBranchSelected} 
+               />
                <FileSelector files={repoFiles}/>
             </div>
 

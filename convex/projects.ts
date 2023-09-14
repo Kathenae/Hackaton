@@ -117,11 +117,18 @@ export const deleteProject = mutation({
 })
 
 export const createEditorNode = mutation({
-   args: { projectId: v.id('projects'), path: v.string(), content: v.string(), position: v.object({ x: v.number(), y: v.number() }) },
-   handler: async (ctx, { projectId, path, content, position }) => {
+   args: { 
+      projectId: v.id('projects'), 
+      branch: v.string(),
+      path: v.string(),
+      content: v.string(),
+      sha: v.optional(v.string()),
+      position: v.object({ x: v.number(), y: v.number() }) 
+   },
+   handler: async (ctx, data) => {
       // TODO: Check if user is allowed to create file views
       // const user = await ctx.auth.getUserIdentity() 
-      await ctx.db.insert('editornodes', { projectId, path, content, position, expanded: true });
+      await ctx.db.insert('editornodes', { ...data, expanded: true });
    }
 })
 

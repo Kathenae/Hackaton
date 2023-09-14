@@ -28,7 +28,7 @@ export default function ProjectCard({ project }: ProjectCardProps) {
                   <Link className="hover:underline" to={`/project/${project._id}`}>{project.name}</Link>
                </CardTitle>
                <DropdownMenu>
-                  <DropdownMenuTrigger>
+                  <DropdownMenuTrigger asChild>
                      <Button variant='ghost' size='icon'>
                         <MoreVertical />
                      </Button>
