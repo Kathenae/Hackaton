@@ -8,17 +8,18 @@ import { EditorNodeData } from 'convex/schema';
 import { useEffect, useRef, useState } from 'react';
 import { useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
+import { Button } from './ui/button';
 
 type EditorNodeProps = NodeProps<EditorNodeData>
 
 export default function EditorNode({ data }: EditorNodeProps) {
 
    const [editorContent, setContent] = useState(data.content)
+   const [isExpanded, setExpanded] = useState(data.expanded)
    const [isFocused, setIsFocused] = useState(false)
    const updateContent = useMutation(api.projects.updateEditorNode)
    const deleteNode = useMutation(api.projects.deleteEditorNode)
    const { theme, systemIsDark } = useTheme()
-   const [isExpanded, setExpanded] = useState(true)
    const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
 
    function onBeforeMount(monaco: Monaco) {
@@ -63,6 +64,7 @@ export default function EditorNode({ data }: EditorNodeProps) {
 
    const onToggleExpanded = () => {
       setExpanded(!isExpanded)
+      updateContent({ id: data._id, expanded: !data.expanded })
    }
 
    useEffect(() => {
@@ -77,6 +79,10 @@ export default function EditorNode({ data }: EditorNodeProps) {
       }
    }, [data.content, data.textPosition, isFocused])
 
+   useEffect(() => {
+      setExpanded(data.expanded)
+   }, [data.expanded])
+
    return (
       <div className="bg-neutral-100 dark:bg-neutral-800 rounded-lg relative group" onFocus={() => setIsFocused(true)} onBlur={() => setIsFocused(false)}>
          <header className="p-4 drag-handle relative">
@@ -84,9 +90,9 @@ export default function EditorNode({ data }: EditorNodeProps) {
                <i className={`${getFileIconClass(data.path ?? '')}`}/>
                <span>{data.path}</span>
             </h1>
-            <button className='absolute top-4 right-4 scale-75 text-gray-400 cursor-pointer' onClick={onClose}>
-               <X />
-            </button>
+            <Button variant={'ghost'} size={'icon'} className='absolute top-2 right-2' onClick={onClose}>
+               <X className='text-gray-400 transition-all scale-75 hover:scale-100 cursor-pointer'/>
+            </Button>
          </header>
          <div className={cn("transition-all", isExpanded ? "h-[400px] w-[700px]" : "w-[264px]")}>
             <Editor
@@ -109,9 +115,11 @@ export default function EditorNode({ data }: EditorNodeProps) {
                }}
             />
          </div>
-         <footer className='p-4 h-14 flex drag-handle'>
-            {isExpanded && <ArrowUpLeft onClick={onToggleExpanded} className='ml-auto text-gray-400 transition-all hidden group-hover:block scale-75 hover:scale-100 cursor-pointer bottom-4 right-1' />}
-            {!isExpanded && <ArrowDownRight onClick={onToggleExpanded} className='ml-auto text-gray-400 transition-all hidden group-hover:block scale-75 hover:scale-100 cursor-pointer bottom-4 right-1' />}
+         <footer className='relative p-4 h-14 flex drag-handle'>
+            <Button variant={'ghost'} size={'icon'} className='absolute top-2 right-2' onClick={onToggleExpanded}>
+               {isExpanded && <ArrowUpLeft className='text-gray-400 transition-all hidden group-hover:block scale-75 hover:scale-100 cursor-pointer' />}
+               {!isExpanded && <ArrowDownRight className='text-gray-400 transition-all hidden group-hover:block scale-75 hover:scale-100 cursor-pointer' />}
+            </Button>
          </footer>
       </div>
    )

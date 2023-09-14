@@ -5,6 +5,7 @@ import LoginPage from "./pages/LoginPage";
 import ErrorPage from "./pages/ErrorPage";
 import ProjectPage from "./pages/ProjectPage";
 import JoinPage from "./pages/JoinPage";
+import AuthLayout from "./pages/AuthLayout";
 
 export const router = createBrowserRouter([
    {
@@ -14,19 +15,25 @@ export const router = createBrowserRouter([
       children: [
          {
             path: '/',
-            element: <HomePage />
+            element: <AuthLayout />,
+            children: [
+               {
+                  path: '/',
+                  element: <HomePage />
+               },
+               {
+                  path: '/project/:id',
+                  element: <ProjectPage />
+               },
+               {
+                  path: '/join/:inviteCode',
+                  element: <JoinPage />
+               },
+            ]
          },
          {
             path: '/login',
             element: <LoginPage />
-         },
-         {
-            path: '/project/:id',
-            element: <ProjectPage />
-         },
-         {
-            path: '/join/:inviteCode',
-            element: <JoinPage />
          },
       ]
    },

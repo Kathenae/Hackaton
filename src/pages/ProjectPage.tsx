@@ -1,7 +1,7 @@
 import { MenuToggle } from "@/components/MenuToggle";
 import { useTheme } from "@/components/providers/ThemeProvider";
 import { ModeToggle } from "@/components/ModeToggle";
-import { UserButton, useUser } from "@clerk/clerk-react"
+import { UserButton } from "@clerk/clerk-react"
 import { Background, BackgroundVariant, Node, ReactFlow, useNodesState, useReactFlow } from 'reactflow'
 import { Id } from "../../convex/_generated/dataModel"
 import { api } from "../../convex/_generated/api";
@@ -16,6 +16,8 @@ import EditorNode from "@/components/EditorNode";
 import Controls from "@/components/Controls";
 import MembersList from "@/components/MembersList";
 import { router } from "@/routes";
+import { EditorNodeData } from "convex/schema";
+import { Loader2 } from "lucide-react";
 
 const initialNodes: Node[] = []
 const nodeTypes = {
@@ -24,16 +26,15 @@ const nodeTypes = {
 
 export default function ProjectPage() {
 
-   const { isSignedIn } = useUser()
    const { id } = useParams<{ id: string }>()
    const project = useQuery(api.projects.getForUser, { id: id as Id<"projects"> })
    const createEditorNode = useMutation(api.projects.createEditorNode)
-   // const updateEditorNode = useMutation(api.projects.updateEditorNode)
+   const updateEditorNode = useMutation(api.projects.updateEditorNode)
 
    const [nodes, , onNodesChange] = useNodesState(initialNodes);
    const { theme, systemIsDark } = useTheme()
    const [repoFiles, setRepoFiles] = useState<BranchFile[]>()
-   const { setNodes, project: projectPosition, getNode } = useReactFlow()
+   const { setNodes, project: projectPosition, getNode, getZoom } = useReactFlow()
    
    // Load repo files from github
    useEffect(() => {
@@ -107,8 +108,23 @@ export default function ProjectPage() {
 
    }, [project, createEditorNode, projectPosition])
 
-   if (!isSignedIn) {
-      return null;
+   const onNodeDragStart = (event: React.MouseEvent<Element, MouseEvent>, node: Node<EditorNodeData, string | undefined>) => {
+      event.preventDefault();
+      console.log(node.position)
+   }
+
+   const onNodeDragStop = (event: React.MouseEvent<Element, MouseEvent>, node: Node<EditorNodeData, string | undefined>) => {
+      event.preventDefault();
+      updateEditorNode({ id: node.data._id, position: node.position })
+   }
+
+   // Still loading
+   if(project === undefined){
+      return (
+         <div className="w-screen h-screen flex items-center justify-center">
+            <Loader2 className="text-neutral-700 h-32 w-32 animate-spin" />
+         </div>
+      )
    }
 
    return (
@@ -123,6 +139,11 @@ export default function ProjectPage() {
                onDrop={onDrop}
                minZoom={0.2}
                maxZoom={1.0}
+               fitView
+               fitViewOptions={{minZoom: 1.0}}
+               defaultViewport={{x: 0, y: 0, zoom: getZoom()}}
+               onNodeDragStart={onNodeDragStart}
+               onNodeDragStop={onNodeDragStop}
             >
                <Background lineWidth={1} variant={BackgroundVariant.Dots} color={theme == 'dark' || (theme == 'system' && systemIsDark) ? '#888' : '#888'} gap={32} />
                <Controls />
