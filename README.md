@@ -37,6 +37,7 @@ Built for the [Web Dev Cody Hackaton](https://hackathon.webdevcody.com), CodeTog
 - [x] Drag and Drop files into Workspace
 - [x] Code Editor with Multi language support
 - [x] Realtime Code editing
+- [x] Supports Branching and Single file commits
 
 ## So, How do i run it?
 Its easy, just:
@@ -52,15 +53,19 @@ Its easy, just:
 - [x] Remove Members
 - [x] Leave Project
 - [x] Presense (See who's online)
+- [x] Implement Branching and Single file commits
+- [ ] Allow creating new files
 - [ ] Code Presense (See who's editing what)
-- [ ] Better Authorization (Only Project owner should be able to invite or remove members)
-- [ ] Better error handling for when user is offline (clerk or convex servers unreashable)
+- [ ] Add Authorization checks in the backend (Only Project owner should be able to invite or remove members)
 
 #### TODO (Dauting)
-- [ ] Branches, Commits And PR Support
-- [ ] VS Code Extension for better code presense
-- [ ] Lines, Shapes, and Text drawing capabilities
+- [ ] Implement multi file commits
+- [ ] Show indicator when a file has changed in the repo and needs to be "synched"
+- [ ] Implement Fixing merge conflics
+- [ ] Better error handling for when offline (clerk, convex, github unreashable). Right now the app just crashes or doesn't do the thing
 - [ ] Codesandbox esque web environment (HELP!)
+- [ ] VS Code Extension for better code presense (HELP!)
+- [ ] Lines, Shapes, and Text drawing capabilities (Maybe not needed?) 
 
 ### Known Issues
 - File selector freezes on large repos
