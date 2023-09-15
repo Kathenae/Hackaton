@@ -14,6 +14,7 @@ import type {
   FilterApi,
   FunctionReference,
 } from "convex/server";
+import type * as github from "../github";
 import type * as members from "../members";
 import type * as projects from "../projects";
 import type * as users from "../users";
@@ -27,6 +28,7 @@ import type * as users from "../users";
  * ```
  */
 declare const fullApi: ApiFromModules<{
+  github: typeof github;
   members: typeof members;
   projects: typeof projects;
   users: typeof users;

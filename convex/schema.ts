@@ -52,6 +52,13 @@ export type Project = {
    inviteCode?: string | undefined;
    name: string;
    ownerId: Id<"users">;
+   owner?: {
+      name: string;
+      username: string;
+      tokenIdentifier: string;
+      avatarUrl: string;
+      lastSeenTimestamp: string;
+   };
    repo: string;
 }
 

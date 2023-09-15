@@ -136,6 +136,7 @@ export const updateEditorNode = mutation({
    args: { 
       id: v.id('editornodes'), 
       content: v.optional(v.string()), 
+      sha: v.optional(v.string()), 
       position: v.optional(v.object({ x: v.number(), y: v.number() })), 
       expanded: v.optional(v.boolean()),
       textPosition: v.optional(v.object({ 
@@ -145,12 +146,16 @@ export const updateEditorNode = mutation({
          scrollLeft: v.number(), 
       })) 
    },
-   handler: async (ctx, { id, content, position, textPosition, expanded }) => {
+   handler: async (ctx, { id, content, sha, position, textPosition, expanded }) => {
       // TODO: Check if user is allowed to update file views
       // const user = await ctx.auth.getUserIdentity()
 
       if (content) {
          await ctx.db.patch(id, { content })
+      }
+
+      if(sha) {
+         await ctx.db.patch(id, { sha })
       }
 
       if (position) {

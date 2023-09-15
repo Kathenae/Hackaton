@@ -49,9 +49,17 @@ export default function ProjectPage() {
             }
 
             if (project && project.owner) {
-               const { data: branches } = await listBranches({ username: project.owner.username, repo: project.repo })
-               let branch = getMainBranch(branches)
 
+               // Load branches if not loaded yet
+               let branchList : Branches | undefined = branches
+               if(!branchList){
+                  const { data: foundBranches } = await listBranches({ username: project.owner.username, repo: project.repo })
+                  branchList = foundBranches
+                  setBranches(branchList)
+               }
+               
+               // set current branch if not set yet
+               let branch = getMainBranch(branchList)
                if(!currentBranch){
                   setCurrentBranch(branch)
                }
@@ -59,18 +67,17 @@ export default function ProjectPage() {
                   branch = currentBranch
                }
 
-               // if we have a branch
+               // load branch files
                if (branch) {
                   const files = await listBranchFiles({ username: project.owner?.username, repo: project.repo, branch: branch.name });
                   setRepoFiles(files);
-                  setBranches(branches)
                }
                else{
                   alert('Unable to load the main branch from this repo')
                }
             }
          })()
-   }, [project, currentBranch])
+   }, [project, currentBranch, branches])
 
    // Render editor nodes
    useEffect(() => {
@@ -84,7 +91,7 @@ export default function ProjectPage() {
                      type: 'editor',
                      position: position,
                      dragHandle: '.drag-handle',
-                     data: editor,
+                     data: { ...editor, project: project },
                   }
                });
                setNodes(nodes)
@@ -155,6 +162,23 @@ export default function ProjectPage() {
       }
    }
 
+   const onBranchCreated = async (branch: Branch) => {
+      if(!project || !project.owner){
+         return
+      }
+
+      if(branch){
+         setCurrentBranch(branch)
+         const files = await listBranchFiles({ username: project.owner?.username, repo: project.repo, branch: branch.name });
+         setRepoFiles(files);
+
+         if(branches){
+            setBranches([branch, ...branches])
+         }
+      }
+
+   }
+
    // Still loading project
    if(project === undefined){
       return (
@@ -191,9 +215,11 @@ export default function ProjectPage() {
                <MenuToggle project={project}/>
                <BranchSelector 
                   branches={branches} 
-                  repository={project?.repo} 
+                  repo={project?.repo} 
+                  repoOwner={project?.owner?.username}
                   currentBranch={currentBranch}
-                  onBranchSelected={onBranchSelected} 
+                  onBranchSelected={onBranchSelected}
+                  onBranchCreated={onBranchCreated}
                />
                <FileSelector files={repoFiles}/>
             </div>

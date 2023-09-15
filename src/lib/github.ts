@@ -37,21 +37,15 @@ export async function listBranches({ username, repo }: { username: string, repo:
    return response;
 }
 
-export async function commitFile({ username, repo, branch, filepath, filecontent, message, sha }: { username: string, repo: string, branch: string, filecontent: string, filepath: string, message: string, sha: string }) {
-   const octokit = new Octokit({
-      auth: 'MY_AUTH_TOKEN'
-   })
-   const response = await octokit.rest.repos.createOrUpdateFileContents({
+export async function getBranch({ username, repo, branch }: { username: string, repo: string, branch: string }) {
+   const octokit = new Octokit()
+   const response = await octokit.rest.repos.getBranch({
       owner: username,
       repo: repo,
       branch: branch,
-      path: filepath,
-      content: filecontent,
-      message: message,
-      sha: sha,
    })
 
-   return response.status;
+   return response;
 }
 
 export async function listBranchFiles({ username, repo, branch }: { username: string, repo: string, branch: string }) : Promise<BranchFile[]> {

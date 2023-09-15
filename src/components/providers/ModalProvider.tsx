@@ -4,8 +4,9 @@ import { CreateProjectModal } from "../modals/CreateProjectModal";
 import { InvitePeopleModal } from "../modals/InvitePeopleModal";
 import ManageMembersModal from "../modals/ManageMembersModal";
 import LeaveProjectModal from "../modals/LeaveProjectModal";
+import { CreateBranchModal } from "../modals/CreateBranchModal";
 
-type ModalName = "inactive" | 'create-project' | 'invite-people' | 'manage-members' | 'leave-project'
+type ModalName = "inactive" | 'create-project' | 'invite-people' | 'manage-members' | 'leave-project' | 'create-branch'
 
 export type ModalProps = PropsWithChildren<{
    open: boolean,
@@ -52,6 +53,7 @@ export default function ModalProvider({ children }: PropsWithChildren) {
             {ModalMap(InvitePeopleModal, 'invite-people')}
             {ModalMap(ManageMembersModal, 'manage-members')}
             {ModalMap(LeaveProjectModal, 'leave-project')}
+            {ModalMap(CreateBranchModal, 'create-branch')}
          </>
       </ModalContext.Provider>
    )

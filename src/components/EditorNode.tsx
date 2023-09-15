@@ -1,24 +1,29 @@
-import { ArrowDownRight, ArrowUpLeft, X } from 'lucide-react'
+import { ArrowDownRight, ArrowUpLeft, Loader2, X } from 'lucide-react'
 import { NodeProps } from "reactflow";
 import Editor, { Monaco } from "@monaco-editor/react";
 import { editor } from 'monaco-editor'
 import { useTheme } from "./providers/ThemeProvider";
 import { cn, getFileIconClass } from '@/lib/utils';
-import { EditorNodeData } from 'convex/schema';
+import { EditorNodeData, Project } from 'convex/schema';
 import { useEffect, useRef, useState } from 'react';
-import { useMutation } from 'convex/react';
+import { useAction, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Button } from './ui/button';
+import { getRepoFileContent } from '@/lib/github';
 
-type EditorNodeProps = NodeProps<EditorNodeData>
+type EditorNodeProps = NodeProps<EditorNodeData & {project: Project}>
 
 export default function EditorNode({ data }: EditorNodeProps) {
 
    const [editorContent, setContent] = useState(data.content)
    const [isExpanded, setExpanded] = useState(data.expanded)
    const [isFocused, setIsFocused] = useState(false)
-   const updateContent = useMutation(api.projects.updateEditorNode)
+   const [isCommiting, setIsCommiting] = useState(false)
+   const [isLoading, setLoading] = useState(false)
+   const [commitMessage, setCommitMessage] = useState("")
+   const updateEditor = useMutation(api.projects.updateEditorNode)
    const deleteNode = useMutation(api.projects.deleteEditorNode)
+   const commitFile = useAction(api.github.commitFile)
    const { theme, systemIsDark } = useTheme()
    const editorRef = useRef<editor.IStandaloneCodeEditor | null>(null)
 
@@ -49,11 +54,17 @@ export default function EditorNode({ data }: EditorNodeProps) {
    }
 
    const onChange = (newContent: string | undefined) => {
+
+      if(isCommiting){
+         setCommitMessage(newContent ?? '')
+         return;
+      }
+
       setContent(newContent ?? '')
       
       if(editorRef.current){
          const editorTextPosition = editorRef.current.getPosition()
-         updateContent({ id: data._id, content: newContent, textPosition: { 
+         updateEditor({ id: data._id, content: newContent, textPosition: { 
             line: editorTextPosition?.lineNumber ?? 0, 
             column: editorTextPosition?.column ?? 0,
             scrollTop: editorRef.current.getScrollTop(),
@@ -62,9 +73,82 @@ export default function EditorNode({ data }: EditorNodeProps) {
       }
    }
 
+   const onCommit = async () => {
+      setIsCommiting(true)
+      setCommitMessage(`\n# Commiting to branch "${data.branch}". Please enter your commit message`)
+      setTimeout(() => {
+         editorRef.current?.setPosition({ lineNumber: 0, column: 0 })
+      }, 100)
+   }
+   
+   const onRevert = async () => {
+      if (data.project.owner) {
+         const fileContent = await getRepoFileContent({
+            username: data.project.owner.username,
+            repo: data.project.repo,
+            branchName: data.branch,
+            path: data.path,
+         })
+
+         if(typeof fileContent === 'string'){
+            updateEditor({ id: data._id, content: fileContent })
+            setContent(fileContent)
+         }
+      }
+   }
+
+   const onConfirm = async () => {
+      try{
+         setLoading(true)
+         if(!data.project.owner){
+            return;
+         }
+   
+         const messageWithoutComments = commitMessage.replace(/^#.*$/gm, '');
+         const response = await commitFile({
+            id: data._id,
+            username: data.project.owner?.username,
+            repo: data.project.repo,
+            branch: data.branch,
+            filepath: data.path,
+            fileContent: data.content,
+            message: messageWithoutComments,
+            sha: data.sha, 
+         })
+   
+         if(response && (response.status == 200 || response.status == 201)){
+            setIsCommiting(false)
+            setCommitMessage('')
+         }
+      }
+      catch(error){
+         console.error(error)
+      }
+      finally{
+         setLoading(false)
+      }
+   }
+
+   const onCancel = async () => {
+      setIsCommiting(false)
+   }
+
    const onToggleExpanded = () => {
       setExpanded(!isExpanded)
-      updateContent({ id: data._id, expanded: !data.expanded })
+      updateEditor({ id: data._id, expanded: !data.expanded })
+   }
+
+   const chooseContent = () => {
+      if (isCommiting) {
+         return commitMessage;
+      }
+
+      if (isFocused) {
+         return editorContent
+      }
+      else {
+         return data.content
+      }
    }
 
    useEffect(() => {
@@ -101,7 +185,7 @@ export default function EditorNode({ data }: EditorNodeProps) {
                   isExpanded ? "w-[700px] h-[400px] opacity-100" : "w-[264px] h-[0px] opacity-0 drag-handle"
                )}
                theme={(theme == 'dark' || (theme == 'system' && systemIsDark) ? 'vs-dark' : 'light')}
-               value={!isFocused? data.content : editorContent}
+               value={chooseContent()}
                onChange={onChange}
                path={data.path ?? ''}
                beforeMount={onBeforeMount}
@@ -115,7 +199,22 @@ export default function EditorNode({ data }: EditorNodeProps) {
                }}
             />
          </div>
-         <footer className='relative p-4 h-14 flex drag-handle'>
+         <footer className='relative px-4 h-14 flex items-center space-x-2 drag-handle'>
+            {isExpanded && isCommiting &&
+               <>
+                  <Button disabled={isLoading} onClick={onConfirm} size={'sm'} variant={'outline'}>
+                     Confirm
+                     {isLoading && <Loader2 className="animate-spin" />}
+                  </Button>
+                  <Button disabled={isLoading} onClick={onCancel} size={'sm'} variant={'destructive'}>Cancel</Button>
+               </>
+            }
+            {isExpanded && !isCommiting &&
+               <>
+                  <Button onClick={onCommit} size={'sm'} variant={'outline'}>Commit</Button>
+                  <Button onClick={onRevert} size={'sm'} variant={'destructive'}>Revert</Button>
+               </>
+            }
             <Button variant={'ghost'} size={'icon'} className='absolute top-2 right-2' onClick={onToggleExpanded}>
                {isExpanded && <ArrowUpLeft className='text-gray-400 transition-all hidden group-hover:block scale-75 hover:scale-100 cursor-pointer' />}
                {!isExpanded && <ArrowDownRight className='text-gray-400 transition-all hidden group-hover:block scale-75 hover:scale-100 cursor-pointer' />}
