@@ -19,7 +19,7 @@ export const store = mutation({
        .unique();
      if (user !== null) {
 
-       // If we've seen this identity before but the name has changed, patch the value.
+        // If we've seen this identity before but the name has changed, patch the value.
         if (user.name !== identity.name && user.name !== identity.nickname) {
            await ctx.db.patch(user._id, { name: identity.name ?? identity.nickname });
         }
@@ -32,16 +32,22 @@ export const store = mutation({
            await ctx.db.patch(user._id, { username: identity.nickname })
         }
 
+        if (user.subject !== identity.subject) {
+           await ctx.db.patch(user._id, { subject: identity.subject })
+        }
+
         // Update last seen
         await ctx.db.patch(user._id, {lastSeenTimestamp: new Date().toISOString()})
 
        return user._id;
      }
+
      // If it's a new identity, create a new `User`.
      return await ctx.db.insert("users", {
        name: identity.name ?? identity.nickname!,
        username: identity.nickname!,
        avatarUrl: identity.pictureUrl,
+       subject: identity.subject,
        tokenIdentifier: identity.tokenIdentifier,
        lastSeenTimestamp: new Date().toISOString()
      });

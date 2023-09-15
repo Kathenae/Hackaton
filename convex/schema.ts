@@ -6,6 +6,7 @@ export default defineSchema({
    users: defineTable({
       name: v.string(),
       username: v.string(),
+      subject: v.optional(v.string()),
       tokenIdentifier: v.string(),
       avatarUrl: v.optional(v.string()),
       lastSeenTimestamp: v.string(),

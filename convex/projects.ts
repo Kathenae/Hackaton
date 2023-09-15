@@ -26,6 +26,8 @@ export const getForUser = query({
             async (member) => {
                const user = await ctx.db.get(member.userId);
 
+               delete user?.subject
+
                return {
                   ...member,
                   user,
