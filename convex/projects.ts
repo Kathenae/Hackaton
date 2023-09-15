@@ -1,4 +1,4 @@
-import { mutation, query } from "./_generated/server";
+import { internalQuery, mutation, query } from "./_generated/server";
 import { v } from "convex/values";
 import { Project } from "./schema";
 import { v4 as uuidv4 } from 'uuid';
@@ -181,4 +181,47 @@ export const deleteEditorNode = mutation({
       // const user = await ctx.auth.getUserIdentity() 
       await ctx.db.delete(id)
    }
+})
+
+export const getWithCode = internalQuery({
+   args: {inviteCode: v.string()},
+   handler: async (ctx, { inviteCode }) => {
+
+      const project = await ctx.db.query('projects').withIndex('byInviteCode', q => q.eq('inviteCode', inviteCode)).first()
+
+      if(!project){
+         return null;
+      }
+
+      const projectOwner = await ctx.db.get(project.ownerId);
+      const editorNodes = await ctx.db.query('editornodes').withIndex('byProjectId', (q) => q.eq('projectId', project._id)).collect()
+      const membersWithUser = await Promise.all(
+         (await ctx.db.query('members').withIndex('byProjectId', (q) => q.eq('projectId', project._id)).collect()).map(
+            async (member) => {
+               const user = await ctx.db.get(member.userId);
+
+               return {
+                  ...member,
+                  user,
+               }
+            })
+      )
+
+      return {
+         ...project,
+         editorNodes,
+         owner: projectOwner,
+         members: membersWithUser,
+      }
+   }
+})
+
+export const projectIdForCode = query({
+   args: {
+      inviteCode: v.optional(v.string()),
+   },
+   handler: async (ctx, {inviteCode}) => {
+       const project = await ctx.db.query('projects').withIndex('byInviteCode', q => q.eq('inviteCode', inviteCode)).first()
+       return project?._id
+   },
 })

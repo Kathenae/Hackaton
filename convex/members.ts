@@ -1,4 +1,4 @@
-import { mutation } from "./_generated/server";
+import { internalMutation, internalQuery, mutation } from "./_generated/server";
 import { v } from "convex/values";
 import { v4 as uuidv4 } from 'uuid';
 import * as users from "./users";
@@ -12,57 +12,33 @@ export const generateInviteCode = mutation({
    }
 })
 
-export const joinProject = mutation({
-   args: { inviteCode: v.string() },
-   handler: async (ctx, { inviteCode }) => {
-
-      const user = await users.current(ctx)
-
-      // Check if user is logged
-      if (!user) {
-         return {
-            error: 'You need to be logged in to be able to join the project'
-         }
-      }
-
-      // Check if project exists
-      const project = await ctx.db.query('projects').withIndex('byInviteCode', (q) => q.eq('inviteCode', inviteCode)).first()
-      if (!project) {
-         return {
-            error: 'Unable to join the project, please check your invite url'
-         }
-      }
-      
+export const getMember = internalQuery({
+   args: {
+      projectId: v.id('projects'),
+      userId: v.id('users'),
+   },
+   handler: async (ctx, { projectId, userId }) => {
       const member = await ctx.db
          .query('members')
-         .withIndex('byUserIdAndProjectId', (q) => q.eq('userId', user._id).eq('projectId', project._id))
-         .unique()  
-      
-      // Check if user not already member of the project
-      if(member){
-         return {
-            message: 'ALREADY_JOINED',
-            data: {
-               memberId: member._id,
-               projectId: project._id
-            }
-         }
-      }
+         .withIndex('byUserIdAndProjectId', (q) => q.eq('userId', userId).eq('projectId', projectId))
+         .first()
+
+      return member;
+   }
+})
+
+export const addMember = internalMutation({
+   args: { projectId: v.id('projects'), userId: v.id('users') },
+   handler: async (ctx, { projectId, userId }) => {
 
       // if not add new member
       const memberId = await ctx.db.insert('members', {
-         userId: user._id,
-         projectId: project._id,
+         userId: userId,
+         projectId: projectId,
          lastseenTimestamp: new Date().toISOString()
       });
 
-      return {
-         message: 'JOINED_SUCCESSFULLY',
-         data: {
-            memberId,
-            projectId: project._id
-         }
-      };
+      return memberId;
    }
 })
 

@@ -1,7 +1,7 @@
 import { router } from "@/routes"
 import { api } from "../../convex/_generated/api"
-import { useMutation } from "convex/react"
-import { useEffect, useState } from "react"
+import { useAction, useQuery } from "convex/react"
+import { useState } from "react"
 import { useParams } from "react-router-dom"
 import { AlertCircle, Loader2 } from "lucide-react"
 import { Dialog, DialogContent, DialogDescription, DialogFooter, DialogHeader, DialogTitle } from "@/components/ui/dialog"
@@ -9,50 +9,62 @@ import { Button } from "@/components/ui/button"
 
 export default function JoinPage() {
 
-   const [message, setMessage] = useState('')
+   const [errorMessage, setErrorMessage] = useState('')
+   const [loading, setLoading] = useState(false)
    const { inviteCode } = useParams()
-   const joinProject = useMutation(api.members.joinProject)
+   const projectId = useQuery(api.projects.projectIdForCode, { inviteCode })
+   const joinProject = useAction(api.github.joinProjectAsCollaborator)
 
-   useEffect(() => {
-      (async () => {
+   const onAccept = async () => {
+      try{
+         setLoading(true)
+         setErrorMessage('')
 
          if (!inviteCode) {
-            setMessage('No invite code provided');
+            setErrorMessage('No invite code provided');
             return
          }
-
+   
          const response = await joinProject({ inviteCode })
-
-         if (!response.error) {
-            router.navigate('/project/' + response.data?.projectId)
+   
+         if (response.success) {
+            router.navigate('/project/' + projectId)
          }
-         else {
-            setMessage(response.error)
+   
+         if(response.error){
+            setErrorMessage(response.error)
          }
-      })()
-
-   }, [inviteCode, joinProject])
+      }
+      catch(error){
+         console.error(error)
+      }
+      finally{
+         setLoading(false)
+      }
+   }
 
    const onGoHome = () => {
       router.navigate('/')
    }
    return (
       <div className="w-screen h-screen flex items-center justify-center">
-         {!message && <Loader2 className="text-neutral-700 h-32 w-32 animate-spin" />}
-         <Dialog open={!!message}>
+         {loading && <Loader2 className="text-neutral-700 h-32 w-32 animate-spin" />}
+         <Dialog open={!loading}>
             <DialogContent>
                <DialogHeader>
                   <DialogTitle className="flex items-center space-x-2">
-                     <AlertCircle className="w-6 h-6" />
-                     <span>Ooops</span>
+                     <AlertCircle />
+                     <span>Join Project</span>
                   </DialogTitle>
                   <DialogDescription className="!mt-4">
-                     {message}
+                     Are you sure you want to join this project? You will be added as a collaborator on the project's github repo
                   </DialogDescription>
                </DialogHeader>
 
-               <DialogFooter className="justify-center">
-                  <Button onClick={onGoHome} type="submit">Go Home</Button>
+               <DialogFooter className="justify-center items-center">
+                  <span className="mr-auto text-destructive">{errorMessage}</span>
+                  <Button onClick={onAccept} type="submit">Accept</Button>
+                  <Button variant={'secondary'} onClick={onGoHome} type="submit">Go Home</Button>
                </DialogFooter>
             </DialogContent>
          </Dialog>

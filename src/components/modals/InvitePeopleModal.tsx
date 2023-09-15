@@ -71,6 +71,7 @@ export function InvitePeopleModal({ open, onOpenStateChange }: ModalProps) {
                         {!isCopying && <Copy />}
                      </Button>
                   </div>
+                  <small className="text-center text-xs"><b>Note:</b> Anyone who joins using this link will be added to the repository as a collaborator with 'push' permissions</small>
                </div>
             </div>
             <DialogFooter>
