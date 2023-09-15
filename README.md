@@ -45,10 +45,12 @@ Its easy, just:
 - Run `npm install` to install dependencies
 - Run `npx convex dev` to setup your convex project and sync your schema and functions
 - Create a clerk project and setup a Convex JWT template named "convex" because we need it for auth (check auth.config.js)
+- Make sure to only use the github OAuth provider and include the `public_repo` scope in your clerk project
 - Go to convex dashboard and setup your CLERK_CONVEX_ISSUER_URL copied from the JWT template
 - Edit `/src/pages/Root.tsx` to use your clerk publishable key on the ClerkProvider (using .env.local for this wasn't possible because it kept being replaced by convex dev or so i think)
 - Create a `.env.local` with CONVEX_DEPLOYMENT and VITE_CONVEX_URL variables (npx convex dev should have created this for you)
 - `npm run dev`
+
 #### TODO (Soon)
 - [x] Remove Members
 - [x] Leave Project
