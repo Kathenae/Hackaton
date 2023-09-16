@@ -42,7 +42,6 @@ export default function StoredUserProvider({ children }: PropsWithChildren) {
 
    useEffect(() => {
       const intervalId = setInterval(async () => {
-         console.log('Updating last seen')
          await updateLastSeen()
       }, 1 * 60 * 1000)
 
