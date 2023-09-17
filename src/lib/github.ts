@@ -87,6 +87,17 @@ export async function getRepoFileContent({username, repo, path, branchName}: {us
    return data;
 }  
 
+
+export async function listLanguages({ username, repo }: { username: string, repo: string }) {
+   const octokit = new Octokit()
+   const response = await octokit.rest.repos.listLanguages({
+      owner: username,
+      repo: repo,
+   })
+
+   return response.data;
+}
+
 export function getMainBranch(branches: Branches) {
    return branches?.find(b => b.name.toLowerCase() == 'main' || b.name.toLowerCase() == 'master')
 }

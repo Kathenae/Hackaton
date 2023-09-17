@@ -70,7 +70,19 @@ export const listForUser = query({
          return result;
       }, [])
 
-      return projects
+      const projectsWithOwner = await Promise.all(
+        projects.map(async (project) => {
+            const projectOwner = await ctx.db.get(project.ownerId);
+            delete projectOwner?.subject
+
+            return {
+               ...project,
+               owner: projectOwner
+            }
+        })
+      )
+
+      return projectsWithOwner
    },
 })
 
