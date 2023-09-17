@@ -21,6 +21,7 @@ import { useState } from "react"
 import { Popover, PopoverContent, PopoverTrigger } from "../ui/popover"
 import { Command, CommandEmpty, CommandGroup, CommandInput, CommandItem } from "../ui/command"
 import { cn } from "@/lib/utils"
+import { useToast } from "../ui/use-toast"
 
 const FormSchema = z.object({
    branchName: z.string().min(4).max(23),
@@ -28,10 +29,17 @@ const FormSchema = z.object({
 })
 
 type FormType = z.infer<typeof FormSchema>
+type ModalData = { 
+   branches: github.Branches, 
+   repo: string, 
+   repoOwner: string, 
+   onBranchCreated: (bracnh: github.Branch) => void 
+}
 
 export function CreateBranchModal({ open, onOpenStateChange }: ModalProps) {
 
-   const { closeModal, data: modalData } = useModal<{ branches: github.Branches, repo: string, repoOwner: string, onBranchCreated: (bracnh: github.Branch) => void }>()
+   const { toast } = useToast()
+   const { closeModal, data: modalData } = useModal<ModalData>()
    const [isLoading, setLoading] = useState(false)
    const [dropdownOpen, setDropdownOpen] = useState(false)
 
@@ -65,7 +73,10 @@ export function CreateBranchModal({ open, onOpenStateChange }: ModalProps) {
             const branch = await github.getBranch({repo: modalData.repo, username: modalData.repoOwner, branch: data.branchName})
             modalData.onBranchCreated(branch.data)
             closeModal()
-            // router.navigate('/project/' + modalData.projectId)
+            toast({
+               title: 'Branch Created',
+               description: `"${data.branchName}" created successfully`
+            })
          }
       }
       catch (error) {

@@ -6,6 +6,7 @@ import { ConvexReactClient } from "convex/react";
 import { useTheme } from '@/components/providers/ThemeProvider';
 import ModalProvider from '@/components/providers/ModalProvider';
 import StoredUserProvider from '@/components/providers/StoredUserProvider';
+import { Toaster } from '@/components/ui/toaster';
 
 
 const convex = new ConvexReactClient(import.meta.env.VITE_CONVEX_URL as string);
@@ -21,6 +22,7 @@ export default function Root() {
                <ModalProvider>
                   <Outlet />
                </ModalProvider>
+               <Toaster />
             </StoredUserProvider>
          </ConvexProviderWithClerk>
       </ClerkProvider>

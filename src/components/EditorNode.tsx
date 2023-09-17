@@ -9,12 +9,13 @@ import { useEffect, useRef, useState } from 'react';
 import { useAction, useMutation } from 'convex/react';
 import { api } from '../../convex/_generated/api';
 import { Button } from './ui/button';
-import { getRepoFileContent } from '@/lib/github';
+import { useToast } from './ui/use-toast';
 
 type EditorNodeProps = NodeProps<EditorNodeData & {project: Project}>
 
 export default function EditorNode({ data }: EditorNodeProps) {
 
+   const { toast } = useToast()
    const [editorContent, setContent] = useState(data.content)
    const [isExpanded, setExpanded] = useState(data.expanded)
    const [isFocused, setIsFocused] = useState(false)
@@ -80,22 +81,6 @@ export default function EditorNode({ data }: EditorNodeProps) {
          editorRef.current?.setPosition({ lineNumber: 0, column: 0 })
       }, 100)
    }
-   
-   const onRevert = async () => {
-      if (data.project.owner) {
-         const fileContent = await getRepoFileContent({
-            username: data.project.owner.username,
-            repo: data.project.repo,
-            branchName: data.branch,
-            path: data.path,
-         })
-
-         if(typeof fileContent === 'string'){
-            updateEditor({ id: data._id, content: fileContent })
-            setContent(fileContent)
-         }
-      }
-   }
 
    const onConfirm = async () => {
       try{
@@ -119,6 +104,11 @@ export default function EditorNode({ data }: EditorNodeProps) {
          if(response && (response.status == 200 || response.status == 201)){
             setIsCommiting(false)
             setCommitMessage('')
+            toast({
+               title: 'Commit Sent',
+               description: `Commited "${data.path}" to "${data.branch}" branch successfully`,
+               duration: 3000,
+            })
          }
       }
       catch(error){
@@ -199,12 +189,15 @@ export default function EditorNode({ data }: EditorNodeProps) {
                }}
             />
          </div>
-         <footer className='relative px-4 h-14 flex items-center space-x-2 drag-handle'>
+         <footer className={cn(
+            'relative px-4 h-14 flex items-center space-x-2 cursor-default',
+            !isExpanded && 'drag-handle cursor-grab'
+         )}>
             {isExpanded && isCommiting &&
                <>
-                  <Button disabled={isLoading} onClick={onConfirm} size={'sm'} variant={'outline'}>
-                     Confirm
-                     {isLoading && <Loader2 className="animate-spin" />}
+                  <Button className='flex items-center space-x-2' disabled={isLoading} onClick={onConfirm} size={'sm'} variant={'outline'}>
+                     <span>Confirm</span>
+                     {isLoading && <Loader2 className="w-4 h-4 animate-spin" />}
                   </Button>
                   <Button disabled={isLoading} onClick={onCancel} size={'sm'} variant={'destructive'}>Cancel</Button>
                </>
@@ -212,7 +205,6 @@ export default function EditorNode({ data }: EditorNodeProps) {
             {isExpanded && !isCommiting &&
                <>
                   <Button onClick={onCommit} size={'sm'} variant={'outline'}>Commit</Button>
-                  <Button onClick={onRevert} size={'sm'} variant={'destructive'}>Revert</Button>
                </>
             }
             <Button variant={'ghost'} size={'icon'} className='absolute top-2 right-2' onClick={onToggleExpanded}>
