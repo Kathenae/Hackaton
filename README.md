@@ -1,6 +1,8 @@
 # CodeTogether | Hackaton Submission
 
-Built for the [Web Dev Cody Hackaton](https://hackathon.webdevcody.com), CodeTogether is a fully featured, cross browser, totally not buggy 😅, collaborative coding platform (or app?) that can be used to easily share your project when you need help with something or if you brave enough, use it when you want to collaborate with other developers on an entire project.
+Built for the [Web Dev Cody Hackaton](https://hackathon.webdevcody.com), CodeTogether is a fully featured, cross browser, totally not buggy 😅, collaborative coding platform (or app?) that can be used to easily share your project when you need help with something or if you brave enough, use it when you want to collaborate with other developers on an entire project. 
+
+### [Try it out](https://codetogether.worksper.com)
 
 ![Preview Image](https://media.discordapp.net/attachments/1146254904982253568/1150133350477074562/image.png?width=1031&height=494)
 
