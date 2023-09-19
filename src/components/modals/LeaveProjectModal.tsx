@@ -8,7 +8,7 @@ import { router } from '@/routes';
 
 export default function LeaveProjectModal({ open, onOpenStateChange, children }: ModalProps) {
 
-   const { data: project, closeModal } = useModal<ReturnType<typeof useQuery<typeof api.projects.get>>>()
+   const { data: project, closeModal } = useModal<ReturnType<typeof useQuery<typeof api.projects.getForUser>>>()
    const leaveProject = useMutation(api.members.leave)
 
    const onConfirm = async (confirmed: boolean) => {
